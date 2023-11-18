@@ -1,0 +1,148 @@
+Create Vms. 
+
+[+] Detected desired cluster spec for provision::  cluster_name: robbie-nat1, k8s_version:1.27, cp_count:1, dp_count:1
+
+[+] Copying /opt/rafay/ssh_private_key_file to /home/vagrant/ on 127.0.0.1
+[1.] command to create directory : mkdir -p /opt/rafay/native/robbie-nat1
+
+Execution of command to create cluster directory passed. stdout:
+[2.] command to create hardware csv yaml : echo "hostname,mac,ip_address,netmask,gateway,nameservers,labels,disk,bmc_ip,bmc_username,bmc_password
+robbie-nat1-cp-n-1,08:00:27:E0:17:FC,192.168.10.149,255.255.255.0,192.168.10.1,8.8.8.8,type=cp,/dev/sda,,,
+robbie-nat1-dp-n-1,08:00:27:03:39:45,192.168.10.58,255.255.255.0,192.168.10.1,8.8.8.8,type=dp,/dev/sda,,,
+" > /opt/rafay/native/robbie-nat1/hardware.csv
+
+Execution of command to create hardware csv passed. stdout:
+[3.] command to create cluster config yaml : echo "apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: Cluster
+metadata:
+  name: robbie-nat1
+spec:
+  clusterNetwork:
+    cniConfig:
+      cilium:
+        policyEnforcementMode: default
+    pods:
+      cidrBlocks:
+      - 192.168.0.0/16
+    services:
+      cidrBlocks:
+      - 10.96.0.0/12
+  controlPlaneConfiguration:
+    count: 1
+    endpoint:
+      host: 192.168.10.134
+    machineGroupRef:
+      kind: TinkerbellMachineConfig
+      name: cpmc
+  datacenterRef:
+    kind: TinkerbellDatacenterConfig
+    name: robbie-nat1
+  kubernetesVersion: '\''1.27'\''
+  managementCluster:
+    name: robbie-nat1
+  workerNodeGroupConfigurations:
+  - count: 1
+    machineGroupRef:
+      kind: TinkerbellMachineConfig
+      name: dpmc
+    name: ng1
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: TinkerbellDatacenterConfig
+metadata:
+  name: robbie-nat1
+spec:
+  tinkerbellIP: 192.168.10.89
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: TinkerbellMachineConfig
+metadata:
+  name: cpmc
+spec:
+  hardwareSelector:
+    type: cp
+  osFamily: bottlerocket
+  templateRef:
+    kind: TinkerbellTemplateConfig
+    name: '\'''\''
+  users:
+  - name: ec2-user
+    sshAuthorizedKeys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE=
+      rgill@Robbies-MBP
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: TinkerbellMachineConfig
+metadata:
+  name: dpmc
+spec:
+  hardwareSelector:
+    type: dp
+  osFamily: bottlerocket
+  templateRef:
+    kind: TinkerbellTemplateConfig
+    name: '\'''\''
+  users:
+  - name: ec2-user
+    sshAuthorizedKeys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE=
+      rgill@Robbies-MBP
+" > /opt/rafay/native/robbie-nat1/robbie-nat1.yaml
+
+Execution of command to create cluster config yaml passed. stdout:
+[4.] command to install eksctl cli : curl "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" --silent --location | tar xz -C /tmp; install -m 0755 /tmp/eksctl /usr/local/bin/eksctl
+
+Execution of command to install eksctl cli passed. stdout:
+[5.] command to install yq cli : wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq; chmod +x /usr/bin/yq
+
+Execution of command to install yq cli passed. stdout:
+[6.] command to install eksctl cli : RELEASE_VERSION=$(curl https://anywhere-assets.eks.amazonaws.com/releases/eks-a/manifest.yaml --silent --location | yq ".spec.latestVersion"); EKS_ANYWHERE_TARBALL_URL=$(curl https://anywhere-assets.eks.amazonaws.com/releases/eks-a/manifest.yaml --silent --location | yq ".spec.releases[] | select(.version==\"$RELEASE_VERSION\").eksABinary.$(uname -s | tr A-Z a-z).uri"); curl $EKS_ANYWHERE_TARBALL_URL --silent --location | tar xz ./eksctl-anywhere; install -m 0755 ./eksctl-anywhere /usr/local/bin/eksctl-anywhere
+
+Execution of command to install eksctl anywhere plugin passed. stdout:
+[7.] command to install kubectl cli : export OS="$(uname -s | tr A-Z a-z)"; ARCH=$(test "$(uname -m)" = "x86_64" && echo "amd64" || echo "arm64"); curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/${OS}/${ARCH}/kubectl"; install -m 0755 ./kubectl /usr/local/bin/kubectl
+
+Execution of command to install kubectl cli passed. stdout:
+[8.] command to install docker : apt-get update; apt-get -y install ca-certificates curl gnupg; install -m 0755 -d /etc/apt/keyrings; curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg; chmod a+r /etc/apt/keyrings/docker.gpg; echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null; apt-get update; apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+[9.] command to create cluster : pushd /opt/rafay/native/robbie-nat1; eksctl anywhere create cluster --hardware-csv hardware.csv -f robbie-nat1.yaml 2>&1 | tee -a /opt/rafay/native/robbie-nat1/eksa-create-cluster.log; popd
+cluster creation in progress...
+[10.] command to fetch cluster creation logs : cat /opt/rafay/native/robbie-nat1/eksa-create-cluster.log
+
+Execution of command to fetch cluster creation logs passed. stdout:
+[10.] command to fetch cluster creation logs : cat /opt/rafay/native/robbie-nat1/eksa-create-cluster.log
+
+Execution of command to fetch cluster creation logs passed. stdout: Warning: The recommended number of control plane nodes is 3 or 5
+Warning: The recommended number of control plane nodes is 3 or 5
+Performing setup and validations
+✅ Tinkerbell Provider setup is valid
+✅ Validate OS is compatible with registry mirror configuration
+✅ Validate certificate for registry mirror
+✅ Validate authentication for git provider
+✅ Validate cluster's eksaVersion matches EKS-A version
+Creating new bootstrap cluster
+
+[10.] command to fetch cluster creation logs : cat /opt/rafay/native/robbie-nat1/eksa-create-cluster.log
+
+Execution of command to fetch cluster creation logs passed. stdout: Warning: The recommended number of control plane nodes is 3 or 5
+Warning: The recommended number of control plane nodes is 3 or 5
+Performing setup and validations
+✅ Tinkerbell Provider setup is valid
+✅ Validate OS is compatible with registry mirror configuration
+✅ Validate certificate for registry mirror
+✅ Validate authentication for git provider
+✅ Validate cluster's eksaVersion matches EKS-A version
+Creating new bootstrap cluster
+Provider specific pre-capi-install-setup on bootstrap cluster
+
+[10.] command to fetch cluster creation logs : cat /opt/rafay/native/robbie-nat1/eksa-create-cluster.log
+
+Execution of command to fetch cluster creation logs passed. stdout: Warning: The recommended number of control plane nodes is 3 or 5
+Warning: The recommended number of control plane nodes is 3 or 5
+Performing setup and validations
+✅ Tinkerbell Provider setup is valid
+✅ Validate OS is compatible with registry mirror configuration
+✅ Validate certificate for registry mirror
+✅ Validate authentication for git provider
+✅ Validate cluster's eksaVersion matches EKS-A version
+Creating new bootstrap cluster
+Provider specific pre-capi-install-setup on bootstrap cluster
+Installing cluster-api providers on bootstrap clusterommitment to security and excellence.

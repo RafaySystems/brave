@@ -1,0 +1,17 @@
+How to manually provision vm 
+-----------------------------
+
+1. Start vm on host, so it can PXE boot into hook OS (linuxKit)
+VBoxManage startvm eksabm261-dp-n-1 --type=headless 
+
+2. On admin machine, check on kind cluster and wait for machine to transition to "Provisioned" state 
+docker exec -ti robbie-eksabm261-eks-a-cluster-control-plane kubectl get machines.cluster.x-k8s.io -A
+
+3. Once machine is in Provisioned state, change the bootorder on vm to boot from disk 
+VBoxManage controlvm eksabm261-dp-n-1 poweroff
+VBoxManage modifyvm eksabm261-dp-n-1 --boot1=disk
+
+4. Start vm so it boots from disk  with installed OS - bottlerocket etc. 
+VBoxManage startvm eksabm261-dp-n-1 --type=headless
+
+combined: VBoxManage controlvm ${NODE} poweroff; VBoxManage modifyvm ${NODE} --boot1=disk; sleep 5; VBoxManage startvm ${NODE} --type=headless

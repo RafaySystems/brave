@@ -1,0 +1,78 @@
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: Cluster
+metadata:
+  name: brave-cluster
+spec:
+  kubernetesVersion: "1.27"
+  clusterNetwork:
+    cniConfig:
+      cilium:
+        policyEnforcementMode: default
+    pods:
+      cidrBlocks:
+        - 192.168.0.0/16
+    services:
+      cidrBlocks:
+        - 10.96.0.0/12
+  controlPlaneConfiguration:
+    count: 1
+    endpoint:
+      host: 192.168.10.41 # use any IP here. brave will replace with correct value automatically
+    machineGroupRef:
+      kind: TinkerbellMachineConfig
+      name: mc1
+    upgradeRolloutStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 1
+  workerNodeGroupConfigurations:
+    - count: 1
+      name: md-0
+      machineGroupRef:
+        kind: TinkerbellMachineConfig
+        name: mc2
+      upgradeRolloutStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+  managementCluster:
+    name: brave-cluster
+  datacenterRef:
+    kind: TinkerbellDatacenterConfig
+    name: brave-cluster-dc
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: TinkerbellDatacenterConfig
+metadata:
+  name: brave-cluster-dc
+spec:
+  tinkerbellIP: 192.168.10.105 # use any IP here. brave will replace with correct value automatically
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: TinkerbellMachineConfig
+metadata:
+  name: mc1
+spec:
+  hardwareSelector:
+    type: cp
+  osFamily: bottlerocket
+  users:
+    - name: ec2-user
+      sshAuthorizedKeys:
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDOkFyRz8ZyHNGy6rCrHGXv/8AP5lmYvEhk7clrQouFRBmxD11YecGB88f0KOf0nUM1mvZZmtYvUGKNulsp4DSLSMBVMY+jEHaFGMYuvT039bUmW4nWIRsARyGiXg7Qr4vg+sxt9PKOrQ3w19T4IB9iBOC3S6z5/ipOY3lpnHIv7XV70EBfmQU1b5necBoxALAj/z+t5lZshQpazjbW38nYQl4Sa6egzgvUy50h7AJGgpEb6QvE4wfIMPwMTmdR36A5MuhKHjZfUfUSpvuBrrFDH1/nbY0rNd9ElXU8pjaZSkYlm+lV8W0Ncnn4RRTqb6QLl3s2nlpooOYUZW6gEHMCAGFW/1t8PjjV51tPqjkOoZWAyySzwNifIRahs6/W74solWwWzptqdsTkxM5Gmm/2zxZIgvJbVeXGia/ud7GEdn9kIW9Fh+LKnUKwjMqBXy+h3chVPFE2f1HiiOeh9ln6RI8aHXx5NROcsdHBKFkS1wNOwyvdIk4KNlTCcrnT4vE= ubuntu@hiteshp-eksa-inst
+---
+apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+kind: TinkerbellMachineConfig
+metadata:
+  name: mc2
+spec:
+  hardwareSelector:
+    type: dp
+  osFamily: bottlerocket
+  users:
+    - name: ec2-user
+      sshAuthorizedKeys:
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDOkFyRz8ZyHNGy6rCrHGXv/8AP5lmYvEhk7clrQouFRBmxD11YecGB88f0KOf0nUM1mvZZmtYvUGKNulsp4DSLSMBVMY+jEHaFGMYuvT039bUmW4nWIRsARyGiXg7Qr4vg+sxt9PKOrQ3w19T4IB9iBOC3S6z5/ipOY3lpnHIv7XV70EBfmQU1b5necBoxALAj/z+t5lZshQpazjbW38nYQl4Sa6egzgvUy50h7AJGgpEb6QvE4wfIMPwMTmdR36A5MuhKHjZfUfUSpvuBrrFDH1/nbY0rNd9ElXU8pjaZSkYlm+lV8W0Ncnn4RRTqb6QLl3s2nlpooOYUZW6gEHMCAGFW/1t8PjjV51tPqjkOoZWAyySzwNifIRahs6/W74solWwWzptqdsTkxM5Gmm/2zxZIgvJbVeXGia/ud7GEdn9kIW9Fh+LKnUKwjMqBXy+h3chVPFE2f1HiiOeh9ln6RI8aHXx5NROcsdHBKFkS1wNOwyvdIk4KNlTCcrnT4vE= ubuntu@hiteshp-eksa-inst
+---
+

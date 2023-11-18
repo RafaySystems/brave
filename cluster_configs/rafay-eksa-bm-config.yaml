@@ -1,0 +1,80 @@
+apiVersion: infra.k8smgmt.io/v3
+kind: Cluster
+metadata:
+  name: rafay-bravecluster
+  project: hitesh
+  description: rafay-bravecluster
+spec:
+  type: Eksa_bm
+  blueprint:
+    version: latest
+    name: minimal
+  config:
+    eksaClusterConfig:
+      apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+      kind: Cluster
+      metadata:
+        name: rafay-bravecluster
+      spec:
+        clusterNetwork:
+          cniConfig:
+            cilium: {}
+          pods:
+            cidrBlocks:
+              - 192.168.0.0/16
+          services:
+            cidrBlocks:
+              - 10.96.0.0/12
+        controlPlaneConfiguration:
+          count: 1
+          endpoint:
+            host: 192.168.10.192 # use any IP here. brave will replace with correct value automatically
+          machineGroupRef:
+            kind: TinkerbellMachineConfig
+            name: rafay-bravecluster-cp
+        workerNodeGroupConfigurations:
+          - name: md-0
+            count: 1
+            machineGroupRef:
+              kind: TinkerbellMachineConfig
+              name: rafay-bravecluster-dp
+        datacenterRef:
+          kind: TinkerbellDatacenterConfig
+          name: rafay-braveclusterdc
+        kubernetesVersion: "1.27"
+        managementCluster:
+          name: rafay-bravecluster
+    tinkerbellDatacenterConfig:
+      apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+      kind: TinkerbellDatacenterConfig
+      metadata:
+        name: rafay-braveclusterdc
+      spec:
+        tinkerbellIP: 192.168.10.82 # use any IP here. brave will replace with correct value automatically
+    tinkerbellMachineConfig:
+      - apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+        kind: TinkerbellMachineConfig
+        metadata:
+          name: rafay-bravecluster-cp
+        spec:
+          hardwareSelector:
+            type: cp
+          osFamily: bottlerocket
+          templateRef: {}
+          users:
+            - name: ec2-user
+              sshAuthorizedKeys:
+                - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDOkFyRz8ZyHNGy6rCrHGXv/8AP5lmYvEhk7clrQouFRBmxD11YecGB88f0KOf0nUM1mvZZmtYvUGKNulsp4DSLSMBVMY+jEHaFGMYuvT039bUmW4nWIRsARyGiXg7Qr4vg+sxt9PKOrQ3w19T4IB9iBOC3S6z5/ipOY3lpnHIv7XV70EBfmQU1b5necBoxALAj/z+t5lZshQpazjbW38nYQl4Sa6egzgvUy50h7AJGgpEb6QvE4wfIMPwMTmdR36A5MuhKHjZfUfUSpvuBrrFDH1/nbY0rNd9ElXU8pjaZSkYlm+lV8W0Ncnn4RRTqb6QLl3s2nlpooOYUZW6gEHMCAGFW/1t8PjjV51tPqjkOoZWAyySzwNifIRahs6/W74solWwWzptqdsTkxM5Gmm/2zxZIgvJbVeXGia/ud7GEdn9kIW9Fh+LKnUKwjMqBXy+h3chVPFE2f1HiiOeh9ln6RI8aHXx5NROcsdHBKFkS1wNOwyvdIk4KNlTCcrnT4vE= ubuntu@hiteshp-eksa-inst
+      - apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+        kind: TinkerbellMachineConfig
+        metadata:
+          name: rafay-bravecluster-dp
+        spec:
+          hardwareSelector:
+            type: dp
+          osFamily: bottlerocket
+          templateRef: {}
+          users:
+            - name: ec2-user
+              sshAuthorizedKeys:
+                - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDOkFyRz8ZyHNGy6rCrHGXv/8AP5lmYvEhk7clrQouFRBmxD11YecGB88f0KOf0nUM1mvZZmtYvUGKNulsp4DSLSMBVMY+jEHaFGMYuvT039bUmW4nWIRsARyGiXg7Qr4vg+sxt9PKOrQ3w19T4IB9iBOC3S6z5/ipOY3lpnHIv7XV70EBfmQU1b5necBoxALAj/z+t5lZshQpazjbW38nYQl4Sa6egzgvUy50h7AJGgpEb6QvE4wfIMPwMTmdR36A5MuhKHjZfUfUSpvuBrrFDH1/nbY0rNd9ElXU8pjaZSkYlm+lV8W0Ncnn4RRTqb6QLl3s2nlpooOYUZW6gEHMCAGFW/1t8PjjV51tPqjkOoZWAyySzwNifIRahs6/W74solWwWzptqdsTkxM5Gmm/2zxZIgvJbVeXGia/ud7GEdn9kIW9Fh+LKnUKwjMqBXy+h3chVPFE2f1HiiOeh9ln6RI8aHXx5NROcsdHBKFkS1wNOwyvdIk4KNlTCcrnT4vE= ubuntu@hiteshp-eksa-inst

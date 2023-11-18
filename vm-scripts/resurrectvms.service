@@ -1,0 +1,14 @@
+[Unit]
+Description=Resurrect VMs
+After=vboxweb-service.service
+
+[Service]
+User=root
+Type=simple
+ExecStart=sudo su -c /opt/rafay/vm-scripts/resurrect-vms.sh
+Environment=BASH_ENV=/etc/profile
+Environment=SHELL=/bin/bash
+
+[Install]
+WantedBy=default.target
+

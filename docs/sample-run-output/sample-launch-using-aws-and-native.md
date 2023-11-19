@@ -29,7 +29,7 @@ instance_public_ip = "54.151.22.254"
 
 [+] Switching back to directory /Users/rgill/testbeds/eksa-bm-vbox
 
-[+] Waiting 120 seconds to allow infrastructure to boot up aws
+[+] Waiting 5 minutes to allow infrastructure to boot up aws
 SSH config updated successfully.
 
 [+] Executing on remote host: 54.151.22.254 command: sudo mkdir -p /opt/rafay/; sudo chown -R ubuntu /opt/rafay/

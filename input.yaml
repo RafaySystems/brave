@@ -26,7 +26,7 @@ cluster_provisioner_config:
     #config: none
 
 # Infrastructure provider configuration
-infrastructure_provider: oci # !! CHANGE THIS TO YOUR INFRASTRUCTURE PROVIDER (aws, oci or infra_exists) 
+infrastructure_provider: aws # !! CHANGE THIS TO YOUR INFRASTRUCTURE PROVIDER (aws, oci or infra_exists) 
 infrastructure_provider_config:
   aws:
     region: "us-west-1"
@@ -34,21 +34,21 @@ infrastructure_provider_config:
     instance_type: "c5n.metal" #Choose a metal instance type
     ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE= rgill@Robbies-MBP"
     ssh_key_name: "eksabmsshkey"
-    ssh_private_key_file: "/opt/rafay/keys/oci"    
+    ssh_private_key_file: "/home/ubuntu/keys/brave-key"    
   oci:
-    host_name: "brave-node"
-    instance_flex_memory_in_gbs: 64
-    instance_flex_ocpus: 4    
-    ssh_private_key_file: "/opt/rafay/keys/oci"
-    ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE= rgill@Robbies-MBP"
-    region: "us-phoenix-1"
-    tenancy_ocid: "ocid1.tenancy.oc1..aaaaaaaaaa3ghjcqbrbzmssbzhxzhxf24rpmuyxbaxwcj2axwoqkpd56ljkq"
-    user_ocid: "ocid1.user.oc1..aaaaaaaac6nqpe4rsz3em53qtkkfq2pd4otg3j347wgku6eidkfcf5tr7kta"
-    private_key_path: "/Users/rgill/.oci/oci_api_key.pem" # private key for OCI user
-    fingerprint: "ed:8b:e9:3c:72:4c:39:70:20:0b:97:9e:59:fb:60:e9"
+    #host_name: "brave-node"
+    #instance_flex_memory_in_gbs: 64
+    #instance_flex_ocpus: 4    
+    #ssh_private_key_file: "/home/ubuntu/keys/brave-key"
+    #ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE= rgill@Robbies-MBP"
+    #region: "us-phoenix-1"
+    #tenancy_ocid: "ocid1.tenancy.oc1..aaaaaaaaaa3ghjcqbrbzmssbzhxzhxf24rpmuyxbaxwcj2axwoqkpd56ljkq"
+    #user_ocid: "ocid1.user.oc1..aaaaaaaac6nqpe4rsz3em53qtkkfq2pd4otg3j347wgku6eidkfcf5tr7kta"
+    #private_key_path: "/Users/rgill/.oci/oci_api_key.pem" # private key for OCI user
+    #fingerprint: "ed:8b:e9:3c:72:4c:39:70:20:0b:97:9e:59:fb:60:e9"
   infra_exists:
     #ssh_host_ip: "129.146.86.26"
     #ssh_username: "ubuntu"
-    #ssh_private_key_file: "/opt/rafay/keys/oci"
+    #ssh_private_key_file: "/home/ubuntu/keys/brave-key"
     #ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE= rgill@Robbies-MBP"
     #host_name: "brave-node"

@@ -310,6 +310,10 @@ Host {host_name}
   IdentityFile {ssh_private_key_file}
   User ubuntu
 """
+    # if ~/.ssh/config does not exist, create it
+    if not os.path.exists(ssh_config_path):
+        with open(ssh_config_path, "w") as file:
+            file.write("")
 
     # Read the existing SSH config file
     with open(ssh_config_path, "r") as file:

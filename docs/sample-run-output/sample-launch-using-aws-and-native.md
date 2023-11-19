@@ -115,14 +115,14 @@ b'[+] Flushing local iptables\n[+] Creating natnetwork eksa-net with cidr 192.16
 
 [1.] Executing command to create directory on eksa-admin : mkdir -p /opt/rafay/native/brave
 
-[2.] Creating hardware csv file on eksa-admin: 
-echo "hostname,mac,ip_address,netmask,gateway,nameservers,labels,disk,bmc_ip,bmc_username,bmc_password
-brave-cp-n-1,08:00:27:3B:63:92,192.168.10.25,255.255.255.0,192.168.10.1,8.8.8.8,type=cp,/dev/sda,,,
-brave-dp-n-1,08:00:27:C9:22:A9,192.168.10.148,255.255.255.0,192.168.10.1,8.8.8.8,type=dp,/dev/sda,,,
+[2.] Creating hardware csv file on eksa-admin:
+ echo "hostname,mac,ip_address,netmask,gateway,nameservers,labels,disk,bmc_ip,bmc_username,bmc_password
+brave-cp-n-1,08:00:27:DB:D2:27,192.168.10.203,255.255.255.0,192.168.10.1,8.8.8.8,type=cp,/dev/sda,,,
+brave-dp-n-1,08:00:27:CD:00:3A,192.168.10.12,255.255.255.0,192.168.10.1,8.8.8.8,type=dp,/dev/sda,,,
 " > /opt/rafay/native/brave/hardware.csv
 
-[3.] Creating cluster config yaml on eksa-admin: 
-echo "apiVersion: anywhere.eks.amazonaws.com/v1alpha1
+[3.] Creating cluster config yaml on eksa-admin:
+ echo "apiVersion: anywhere.eks.amazonaws.com/v1alpha1
 kind: Cluster
 metadata:
   name: brave
@@ -140,7 +140,7 @@ spec:
   controlPlaneConfiguration:
     count: 1
     endpoint:
-      host: 192.168.10.137
+      host: 192.168.10.42
     machineGroupRef:
       kind: TinkerbellMachineConfig
       name: cpmc
@@ -162,7 +162,7 @@ kind: TinkerbellDatacenterConfig
 metadata:
   name: brave
 spec:
-  tinkerbellIP: 192.168.10.117
+  tinkerbellIP: 192.168.10.155
 ---
 apiVersion: anywhere.eks.amazonaws.com/v1alpha1
 kind: TinkerbellMachineConfig
@@ -199,32 +199,32 @@ spec:
       rgill@Robbies-MBP
 " > /opt/rafay/native/brave/brave.yaml
 
-[4.] Installing eksctl cli on eksa-admin: 
-curl "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" --silent --location | tar xz -C /tmp; install -m 0755 /tmp/eksctl /usr/local/bin/eksctl
+[4.] Installing eksctl cli on eksa-admin:
+ curl "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" --silent --location | tar xz -C /tmp; install -m 0755 /tmp/eksctl /usr/local/bin/eksctl
 
-[5.] Installing yq cli on eksa-admin: 
-wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq; chmod +x /usr/bin/yq
+[5.] Installing yq cli on eksa-admin:
+ wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq; chmod +x /usr/bin/yq
 
-[6.] Installing eksctl cli on eksa-admin : 
-RELEASE_VERSION=$(curl https://anywhere-assets.eks.amazonaws.com/releases/eks-a/manifest.yaml --silent --location | yq ".spec.latestVersion"); EKS_ANYWHERE_TARBALL_URL=$(curl https://anywhere-assets.eks.amazonaws.com/releases/eks-a/manifest.yaml --silent --location | yq ".spec.releases[] | select(.version==\"$RELEASE_VERSION\").eksABinary.$(uname -s | tr A-Z a-z).uri"); curl $EKS_ANYWHERE_TARBALL_URL --silent --location | tar xz ./eksctl-anywhere; install -m 0755 ./eksctl-anywhere /usr/local/bin/eksctl-anywhere
+[6.] Installing eksctl cli on eksa-admin:
+ RELEASE_VERSION=$(curl https://anywhere-assets.eks.amazonaws.com/releases/eks-a/manifest.yaml --silent --location | yq ".spec.latestVersion"); EKS_ANYWHERE_TARBALL_URL=$(curl https://anywhere-assets.eks.amazonaws.com/releases/eks-a/manifest.yaml --silent --location | yq ".spec.releases[] | select(.version==\"$RELEASE_VERSION\").eksABinary.$(uname -s | tr A-Z a-z).uri"); curl $EKS_ANYWHERE_TARBALL_URL --silent --location | tar xz ./eksctl-anywhere; install -m 0755 ./eksctl-anywhere /usr/local/bin/eksctl-anywhere
 
-[7.] Installing kubectl cli on eksa-admin: 
-export OS="$(uname -s | tr A-Z a-z)"; ARCH=$(test "$(uname -m)" = "x86_64" && echo "amd64" || echo "arm64"); curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/${OS}/${ARCH}/kubectl"; install -m 0755 ./kubectl /usr/local/bin/kubectl
+[7.] Installing kubectl cli on eksa-admin:
+ export OS="$(uname -s | tr A-Z a-z)"; ARCH=$(test "$(uname -m)" = "x86_64" && echo "amd64" || echo "arm64"); curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/${OS}/${ARCH}/kubectl"; install -m 0755 ./kubectl /usr/local/bin/kubectl
 
-[8.] Installing docker on eksa-admin: 
-apt-get update; apt-get -y install ca-certificates curl gnupg; install -m 0755 -d /etc/apt/keyrings; curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg; chmod a+r /etc/apt/keyrings/docker.gpg; echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null; apt-get update; apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+[8.] Installing docker on eksa-admin:
+ apt-get update; apt-get -y install ca-certificates curl gnupg; install -m 0755 -d /etc/apt/keyrings; curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg; chmod a+r /etc/apt/keyrings/docker.gpg; echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null; apt-get update; apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-[9.] Creating cluster: 
-pushd /opt/rafay/native/brave; eksctl anywhere create cluster --hardware-csv hardware.csv -f brave.yaml 2>&1 | tee -a /opt/rafay/native/brave/eksa-create-cluster.log; popd
-    [+] Cluster creation in progress...
+[9.] Creating cluster : pushd /opt/rafay/native/brave; eksctl anywhere create cluster --hardware-csv hardware.csv -f brave.yaml 2>&1 | tee -a /opt/rafay/native/brave/eksa-create-cluster.log; popd
+   [+] Cluster creation in progress...
 
 [10.] Monitoring cluster creation logs for string: 'Creating new workload cluster' : cat /opt/rafay/native/brave/eksa-create-cluster.log
    [+] Execution of command to fetch cluster creation logs passed. stdout:
+
    [+]  .... waiting for 60 seconds to recheck logs ....
 
 [10.] Monitoring cluster creation logs for string: 'Creating new workload cluster' : cat /opt/rafay/native/brave/eksa-create-cluster.log
-   [+] Execution of command to fetch cluster creation logs passed. stdout: 
-Warning: The recommended number of control plane nodes is 3 or 5
+   [+] Execution of command to fetch cluster creation logs passed. stdout:
+ Warning: The recommended number of control plane nodes is 3 or 5
 Warning: The recommended number of control plane nodes is 3 or 5
 Performing setup and validations
 ✅ Tinkerbell Provider setup is valid
@@ -237,23 +237,8 @@ Creating new bootstrap cluster
    [+]  .... waiting for 60 seconds to recheck logs ....
 
 [10.] Monitoring cluster creation logs for string: 'Creating new workload cluster' : cat /opt/rafay/native/brave/eksa-create-cluster.log
-   [+] Execution of command to fetch cluster creation logs passed. stdout: 
-Warning: The recommended number of control plane nodes is 3 or 5
-Warning: The recommended number of control plane nodes is 3 or 5
-Performing setup and validations
-✅ Tinkerbell Provider setup is valid
-✅ Validate OS is compatible with registry mirror configuration
-✅ Validate certificate for registry mirror
-✅ Validate authentication for git provider
-✅ Validate cluster's eksaVersion matches EKS-A version
-Creating new bootstrap cluster
-Provider specific pre-capi-install-setup on bootstrap cluster
-
-   [+]  .... waiting for 60 seconds to recheck logs ....
-
-[10.] Monitoring cluster creation logs for string: 'Creating new workload cluster' : cat /opt/rafay/native/brave/eksa-create-cluster.log
-   [+] Execution of command to fetch cluster creation logs passed. stdout: 
-Warning: The recommended number of control plane nodes is 3 or 5
+   [+] Execution of command to fetch cluster creation logs passed. stdout:
+ Warning: The recommended number of control plane nodes is 3 or 5
 Warning: The recommended number of control plane nodes is 3 or 5
 Performing setup and validations
 ✅ Tinkerbell Provider setup is valid
@@ -263,13 +248,12 @@ Performing setup and validations
 ✅ Validate cluster's eksaVersion matches EKS-A version
 Creating new bootstrap cluster
 Provider specific pre-capi-install-setup on bootstrap cluster
-Installing cluster-api providers on bootstrap cluster
 
    [+]  .... waiting for 60 seconds to recheck logs ....
 
 [10.] Monitoring cluster creation logs for string: 'Creating new workload cluster' : cat /opt/rafay/native/brave/eksa-create-cluster.log
-   [+] Execution of command to fetch cluster creation logs passed. stdout: 
-Warning: The recommended number of control plane nodes is 3 or 5
+   [+] Execution of command to fetch cluster creation logs passed. stdout:
+ Warning: The recommended number of control plane nodes is 3 or 5
 Warning: The recommended number of control plane nodes is 3 or 5
 Performing setup and validations
 ✅ Tinkerbell Provider setup is valid
@@ -283,57 +267,63 @@ Installing cluster-api providers on bootstrap cluster
 Provider specific post-setup
 Creating new workload cluster
 
+
 [11.] Fetching Tinkerbell workflows from cluster : KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get workflows -A -o yaml
    [+] Fetching machine status from cluster to perform power management tasks: KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get machines.cluster.x-k8s.io -A
-   [+] Execution of command to fetch machine status passed. stdout: NAMESPACE     NAME                               CLUSTER   NODENAME   PROVIDERID   PHASE          AGE   VERSION
-eksa-system   brave-ng1-75bbc9dc78xbg8bw-dmf9h   brave                             Pending        33s   v1.27.4-eks-1-27-10
-eksa-system   brave-xsg4h                        brave                             Provisioning   32s   v1.27.4-eks-1-27-10
+   [+] Execution of command to fetch machine status passed. stdout:
+ NAMESPACE     NAME                               CLUSTER   NODENAME   PROVIDERID   PHASE          AGE   VERSION
+eksa-system   brave-fnlgp                        brave                             Provisioning   9s    v1.27.4-eks-1-27-10
+eksa-system   brave-ng1-5899b4fd4bxjhh86-zqdgl   brave                             Pending        11s   v1.27.4-eks-1-27-10
 
    [+] Tinkerbell workflows detected: PENDING:['brave-cp-n-1'] RUNNING:[] FAILED:[] SUCCESS:[]
    [+] Power cycling nodes with Tinkerbell workflows (boot order net) PENDING:['brave-cp-n-1'] OR FAILED:[]
    [+] Powering on cluster node brave-cp-n-1 with boot order net
-   [+] Detected machines in phases ['Pending', 'Provisioning']
+   [+] Detected machines in phases ['Provisioning', 'Pending']
    [+]  .... waiting for 5 minutes to recheck logs ....
 
 [11.] Fetching Tinkerbell workflows from cluster : KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get workflows -A -o yaml
    [+] Fetching machine status from cluster to perform power management tasks: KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get machines.cluster.x-k8s.io -A
-   [+] Execution of command to fetch machine status passed. stdout: NAMESPACE     NAME                               CLUSTER   NODENAME   PROVIDERID                              PHASE         AGE     VERSION
-eksa-system   brave-ng1-75bbc9dc78xbg8bw-dmf9h   brave                                                        Pending       5m37s   v1.27.4-eks-1-27-10
-eksa-system   brave-xsg4h                        brave                tinkerbell://eksa-system/brave-cp-n-1   Provisioned   5m36s   v1.27.4-eks-1-27-10
+   [+] Execution of command to fetch machine status passed. stdout:
+ NAMESPACE     NAME                               CLUSTER   NODENAME   PROVIDERID                              PHASE         AGE     VERSION
+eksa-system   brave-fnlgp                        brave                tinkerbell://eksa-system/brave-cp-n-1   Provisioned   5m14s   v1.27.4-eks-1-27-10
+eksa-system   brave-ng1-5899b4fd4bxjhh86-zqdgl   brave                                                        Pending       5m16s   v1.27.4-eks-1-27-10
 
    [+] Tinkerbell workflows detected: PENDING:[] RUNNING:[] FAILED:[] SUCCESS:['brave-cp-n-1']
    [+] Power cycling nodes with Tinkerbell workflows (boot order net) PENDING:[] OR FAILED:[]
    [+] Power cycling machines.c with Phase Provisioned (boot order disk). brave-cp-n-1
    [+] Powering on cluster node brave-cp-n-1 with boot order disk
-   [+] Detected machines in phases ['Pending', 'Provisioned']
+   [+] Detected machines in phases ['Provisioned', 'Pending']
    [+]  .... waiting for 5 minutes to recheck logs ....
 
 [11.] Fetching Tinkerbell workflows from cluster : KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get workflows -A -o yaml
    [+] Fetching machine status from cluster to perform power management tasks: KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get machines.cluster.x-k8s.io -A
-   [+] Execution of command to fetch machine status passed. stdout: NAMESPACE     NAME                               CLUSTER   NODENAME      PROVIDERID                              PHASE          AGE   VERSION
-eksa-system   brave-ng1-75bbc9dc78xbg8bw-dmf9h   brave                                                           Provisioning   10m   v1.27.4-eks-1-27-10
-eksa-system   brave-xsg4h                        brave     brave-xsg4h   tinkerbell://eksa-system/brave-cp-n-1   Running        10m   v1.27.4-eks-1-27-10
+   [+] Execution of command to fetch machine status passed. stdout:
+ NAMESPACE     NAME                               CLUSTER   NODENAME      PROVIDERID                              PHASE          AGE   VERSION
+eksa-system   brave-fnlgp                        brave     brave-fnlgp   tinkerbell://eksa-system/brave-cp-n-1   Running        10m   v1.27.4-eks-1-27-10
+eksa-system   brave-ng1-5899b4fd4bxjhh86-zqdgl   brave                                                           Provisioning   10m   v1.27.4-eks-1-27-10
 
    [+] Tinkerbell workflows detected: PENDING:['brave-dp-n-1'] RUNNING:[] FAILED:[] SUCCESS:['brave-cp-n-1']
    [+] Power cycling nodes with Tinkerbell workflows (boot order net) PENDING:['brave-dp-n-1'] OR FAILED:[]
    [+] Powering on cluster node brave-dp-n-1 with boot order net
-   [+] Detected machines in phases ['Provisioning', 'Running']
+   [+] Detected machines in phases ['Running', 'Provisioning']
    [+]  .... waiting for 5 minutes to recheck logs ....
 
 [11.] Fetching Tinkerbell workflows from cluster : KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get workflows -A -o yaml
    [+] Fetching machine status from cluster to perform power management tasks: KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get machines.cluster.x-k8s.io -A
-   [+] Execution of command to fetch machine status passed. stdout: NAMESPACE     NAME                               CLUSTER   NODENAME      PROVIDERID                              PHASE         AGE   VERSION
-eksa-system   brave-ng1-75bbc9dc78xbg8bw-dmf9h   brave                   tinkerbell://eksa-system/brave-dp-n-1   Provisioned   15m   v1.27.4-eks-1-27-10
-eksa-system   brave-xsg4h                        brave     brave-xsg4h   tinkerbell://eksa-system/brave-cp-n-1   Running       15m   v1.27.4-eks-1-27-10
+   [+] Execution of command to fetch machine status passed. stdout:
+ NAMESPACE     NAME                               CLUSTER   NODENAME      PROVIDERID                              PHASE         AGE   VERSION
+eksa-system   brave-fnlgp                        brave     brave-fnlgp   tinkerbell://eksa-system/brave-cp-n-1   Running       15m   v1.27.4-eks-1-27-10
+eksa-system   brave-ng1-5899b4fd4bxjhh86-zqdgl   brave                   tinkerbell://eksa-system/brave-dp-n-1   Provisioned   15m   v1.27.4-eks-1-27-10
 
    [+] Tinkerbell workflows detected: PENDING:[] RUNNING:[] FAILED:[] SUCCESS:['brave-cp-n-1', 'brave-dp-n-1']
    [+] Power cycling nodes with Tinkerbell workflows (boot order net) PENDING:[] OR FAILED:[]
    [+] Power cycling machines.c with Phase Provisioned (boot order disk). brave-dp-n-1
    [+] Powering on cluster node brave-dp-n-1 with boot order disk
-   [+] Detected machines in phases ['Provisioned', 'Running']
+   [+] Detected machines in phases ['Running', 'Provisioned']
    [+]  .... waiting for 5 minutes to recheck logs ....
 
-Execution of command to create cluster passed. stdout: /opt/rafay/native/brave /home/vagrant
+Execution of command to create cluster passed. stdout:
+ /opt/rafay/native/brave /home/vagrant
 Warning: The recommended number of control plane nodes is 3 or 5
 Warning: The recommended number of control plane nodes is 3 or 5
 Performing setup and validations

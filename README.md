@@ -75,15 +75,32 @@ Refer to [VM Management, Debugging and Advanced Usage](docs/vm-mgmt.md) doc for 
 ---
 ## Installation
 
-**Prerequisites** : 
-- Python 3.x installed on your system
-- Terraform installed on your system
+### Clone Repo locally
+
+```sh
+git clone https://github.com/RafaySystems/brave.git
+```
+OR 
+
+```sh
+git clone git@github.com:RafaySystems/brave.git
+```
+
+### Install Terraform
+
+Follow [instruction to install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+
+
+### Install Python3 and dependencies 
+
+Ensure Python 3.x is installed on your system. 
 
 In order to avoid modifying your system state, we recommend the use of a virtual environment. Python 3's distribution comes with `venv` preinstalled:
 
 ```sh
 python3 -m venv venv
 source venv/bin/activate
+cd brave
 pip3 install -r requirements.txt
 ```
 
@@ -153,7 +170,7 @@ ssh eksa-admin-1
 
  ```sh
 sudo su - 
-export KUBECONFIG=/opt/rafay/native/brave/brave/brave-eks-a-cluster.kubeconfig kubectl get pods -A
+KUBECONFIG=/opt/rafay/native/brave/brave/brave-eks-a-cluster.kubeconfig kubectl get pods -A
 ```  
 
 

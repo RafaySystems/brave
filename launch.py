@@ -313,7 +313,7 @@ Host {host_name}
     # if ~/.ssh/config does not exist, create it
     if not os.path.exists(ssh_config_path):
         with open(ssh_config_path, "w") as file:
-            file.write("")
+            file.write("#\n")
 
     # Read the existing SSH config file
     with open(ssh_config_path, "r") as file:
@@ -381,7 +381,7 @@ if __name__ == "__main__":
         #remote_host='141.148.174.92'
         print(f"\n[+] Waiting 5 minutes to allow infrastructure to boot up on {infrastructure_provider}")
         import time
-        time.sleep(60*5)  
+        #time.sleep(60*5)  
     elif infrastructure_provider == "infra_exists":
         remote_host = input_data["infrastructure_provider_config"]["infra_exists"]["ssh_host_ip"] 
         host_name = input_data["infrastructure_provider_config"]["infra_exists"]["host_name"]
@@ -391,10 +391,10 @@ if __name__ == "__main__":
         remote_host = launch_infra_on_cloud_provider(tf_dir)
         host_name = input_data["infrastructure_provider_config"]["aws"]["host_name"]
         ssh_private_key_file = input_data["infrastructure_provider_config"]["aws"]["ssh_private_key_file"]
-        #remote_host='141.148.174.92'  
-        print(f"\n[+] Waiting 120 seconds to allow infrastructure to boot up {infrastructure_provider}")
+        #remote_host='141.148.174.92'       
+        print(f"\n[+] Waiting 5 minutes to allow infrastructure to boot up on {infrastructure_provider}")
         import time
-        time.sleep(120)      
+        time.sleep(60*5)          
     
     update_ssh_config_entry(host_name, remote_host, ssh_private_key_file)
     

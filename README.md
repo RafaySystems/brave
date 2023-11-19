@@ -108,17 +108,23 @@ pip3 install -r requirements.txt
 ##  Usage 
 
 
-1. Populate the input yaml file `input.yaml`. This file describes the desired specification to create. 
+1. A file named `input.yaml` is expected to provide input for `brave`. Populate the input yaml file `input.yaml` using the sample file and then edit it as per your setup. This file describes the desired specification to create.
 
-**Note**: Refer to [discussion on structure of `input.yaml`](docs/input-yaml.md)  for further help on creating an `input.yaml` file. An example file is already provided. 
+```sh
+cp -p sample-input.yaml input.yaml
+```
 
-2. Source env 
+Now edit `input.yaml` as per your setup. 
+
+**Note**: Refer to [discussion on structure of `input.yaml`](docs/input-yaml.md)  for detailed description of the file structure and help on creating an `input.yaml` file. 
+
+2. Source python env 
 
 ```sh
 source venv/bin/activate
 ```
 
-3. Launching **`brave`** to create desired setup. Below will create EKSA-BM cluster defined in input.yaml file using specified infra provider 
+3. Launch **`brave`** to create desired setup. Below will create EKSA-BM cluster defined in input.yaml file using specified infrastructure provider 
 
 ```sh
 ./launch.py

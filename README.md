@@ -62,7 +62,7 @@ Refer to [VM Management, Debugging and Advanced Usage](docs/vm-mgmt.md) doc for 
 
 Since Virtualbox does not support Baseboard Management Controller (BMC) integration,  automatically powering machines on and off is not possible. Without BMC support, machines have to be powered on and off manually at the correct time during provisioning, upgrading and scaling. 
 
-To address this issue, `brave` implements a power management algorithm that monitors the state of the cluster and perform automatic power management of the Virtualbox vms without requiring BMC integration. This algorithm is described below: 
+To address this issue, `brave` implements a power management algorithm that monitors the state of the cluster and perform automatic power management of the Virtualbox vms without requiring BMC integration. Powering on and off of vms is carried our using [VBoxManage](https://www.virtualbox.org/manual/ch08.html) tool. This algorithm is described below: 
 
 
 ![Power Management Algorithm](docs/powermanage.jpg)

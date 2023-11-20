@@ -5,6 +5,7 @@
 
 - [Overview](#overview)
 - [How `brave` works](#how-brave-works)
+- [Power Management Algorithm](#power-management-algorithm)
 - [Supported Infrastructure Providers and Cluster Provisioners](#supported-infrastructure-providers-and-cluster-provisioners)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -37,6 +38,8 @@ Since entire infrastructure is contained within a single cloud instance, the ent
 
 ## How `brave` works 
 
+![EKSA BM setup using brave](docs/eksabm-network.jpg)
+
 **`brave`** simplifies EKSA-BM cluster creation by emulating the entire networking and bare metal setup required for creating EKSA-BM clusters on a **single cloud instance** of a cloud provider. **`brave`** achieves this by:
 
 1. `Creating a cloud instance` on a supported cloud or infrastructure provider. [Terraform](https://www.terraform.io/) is used to power this functionality. (A pre-existing compute instance can also be used). Currently supported infrastructure providers are [Oracle Cloud Infrastructure (OCI)](https://www.oracle.com/au/cloud/) and [Amazon Web Services](https://aws.amazon.com/).    
@@ -47,15 +50,36 @@ Since entire infrastructure is contained within a single cloud instance, the ent
 3. Providing an `automation engine to handle cluster lifecycle management operations` for EKSA-BM clusters end to end without any manual intervention. EKSA-BM cluster's lifecycle can be managed by a number of supported provisioners. Currently three types of provisioners are supported:
     -   `rafay` (using [Rafay Systems Inc.](https://docs.rafay.co/clusters/eksa_bm/overview/) Controller)
     -   `native` (using **eksctl anywhere** cli directly)  
-    -   `none`  
+    -   `none`  (no cluster creation is performed)
 
-4. Automatically handling `power management of cluster machines WITHOUT a BMC controller by watching relevant cluster events` and performing power on and off of vms via VBoxManage cli. 
-
-
-![EKSA BM setup using brave](docs/eksabm-network.jpg)
+4. Automatically handling `power management of cluster machines WITHOUT a BMC controller by watching relevant cluster events` and performing power on and off of vms via VBoxManage cli. (See [below](#power-management-algorithm))
 
 
 Refer to [VM Management, Debugging and Advanced Usage](docs/vm-mgmt.md) doc for more details. 
+
+
+### Power Management Algorithm 
+
+Since Virtualbox does not support Baseboard Management Controller (BMC) integration,  automatically powering machines on and off is not possible. Without BMC support, machines have to be powered on and off manually at the correct time during provisioning, upgrading and scaling. 
+
+To address this issue, `brave` implements a power management algorithm that monitors the state of the cluster and perform automatic power management of the Virtualbox vms without requiring BMC integration. This algorithm is described below: 
+
+
+![Power Management Algorithm](docs/powermanage.jpg)
+
+
+1. Start a loop to monitor the cluster creation process.
+
+2. Check if the cluster creation logs indicate cluster has reached state where machines need to be power managed. This is indicated by presence of string "Creating new workload cluster" in the logs.
+
+3. Collect Tinkerbell workflows and their statuses: Pending, Running, Failed, and Success.
+
+4. If there are Pending or Failed Tinkerbell workflows, power cycle the respective Virtualbox vms with net boot order to initiate a PXE boot of the machine and start these workflows. Use MAC address to correlate which Tinkerbell workflows correspond to which Virtualbox vms. 
+
+5. Collect machine status from the cluster. Check if any machine is in the 'Provisioned' phase. If found, power cycle it with boot order set as disk so that it boots from installed OS on the disk by Tinkerbell workflow and enters 'Running' phase.
+
+6. Repeat the loop until all machines.c are in the 'Running' phase, signifying the completion of the cluster creation.
+
 
 ---
 ##  Supported Infrastructure Providers and Cluster Provisioners
@@ -88,7 +112,7 @@ git clone git@github.com:RafaySystems/brave.git
 
 ### Install Terraform
 
-Follow [instruction to install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+Follow [instructions to install Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 
 
 ### Install Python3 and dependencies 

@@ -3,3 +3,4 @@
 *.tfstate.*
 *.tfvars
 *.terraform_output.*
+.terraform.lock.hcl

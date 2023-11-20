@@ -381,7 +381,7 @@ if __name__ == "__main__":
         #remote_host='141.148.174.92'
         print(f"\n[+] Waiting 5 minutes to allow infrastructure to boot up on {infrastructure_provider}")
         import time
-        #time.sleep(60*5)  
+        time.sleep(60*5)  
     elif infrastructure_provider == "infra_exists":
         remote_host = input_data["infrastructure_provider_config"]["infra_exists"]["ssh_host_ip"] 
         host_name = input_data["infrastructure_provider_config"]["infra_exists"]["host_name"]

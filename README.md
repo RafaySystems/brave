@@ -68,17 +68,17 @@ To address this issue, `brave` implements a power management algorithm that moni
 ![Power Management Algorithm](docs/powermanage.jpg)
 
 
-1. Start a loop to monitor the cluster creation process.
+1. Start a loop to monitor cluster progress.
 
-2. Check if the cluster creation logs indicate cluster has reached state where machines need to be power managed. This is indicated by presence of string "Creating new workload cluster" in the logs.
+2. Check if the cluster creation logs indicate cluster has reached state where machines need to be powered on. This is indicated by presence of string **"Creating new workload cluster"** in the logs.
 
-3. Collect Tinkerbell workflows and their statuses: Pending, Running, Failed, and Success.
+3. Collect Tinkerbell workflows and their status: Pending, Running, Failed, and Success.
 
-4. If there are Pending or Failed Tinkerbell workflows, power cycle the respective Virtualbox vms with net boot order to initiate a PXE boot of the machine and start these workflows. Use MAC address to correlate which Tinkerbell workflows correspond to which Virtualbox vms. 
+4. If there are **Pending or Failed** Tinkerbell workflows, power cycle the respective Virtualbox vms with net boot order to initiate a PXE boot of the machine and start these workflows. Use MAC address to correlate which Tinkerbell workflows correspond to which Virtualbox vms. 
 
-5. Collect machine status from the cluster. Check if any machine is in the 'Provisioned' phase. If found, power cycle it with boot order set as disk so that it boots from installed OS on the disk by Tinkerbell workflow and enters 'Running' phase.
+5. Collect machine status from the cluster. Check if any machine is in the **Provisioned** phase. If found, power cycle it with boot order set as disk so that it boots from installed OS on the disk by Tinkerbell workflow and enters **Running** phase.
 
-6. Repeat the loop until all machines.c are in the 'Running' phase, signifying the completion of the cluster creation.
+6. Repeat the loop until all machines are in the **Running** phase, signifying the completion of cluster creation.
 
 
 ---

@@ -139,7 +139,7 @@ def execute_remote_command_shell(hostname, port, username, password, command, ss
         # Read and print the output from the command
         while True:
             output = ssh_session.recv(1024).decode('utf-8')
-            if 'Cluster created' in output:
+            if ('Cluster created' in output) or ('Traceback' in output) or ('ERROR' in output):
                 print(output, end='')
                 ssh_session.close()
                 client.close()
@@ -249,12 +249,12 @@ def copy_code_to_remote_host_and_execute(input_data, remote_host):
     remote_port = 22
     populate_remote_files(remote_host, remote_port, remote_username, "", remote_private_key_path)
 
-    cluster_provisioner = input_data["cluster_provisioner"]
-    cluster_provisioner_data = input_data["cluster_provisioner_config"][cluster_provisioner]
-    if cluster_provisioner == "rafay":
-        rafay_api_key_file = cluster_provisioner_data["rafay_api_key_file"]
+    provisioner = input_data["provisioner"]
+    provisioner_config = input_data["provisioner_config"][provisioner]
+    if provisioner == "rafay_eksabm_cluster":
+        rafay_api_key_file = provisioner_config["rafay_api_key_file"]
 
-    if cluster_provisioner == "rafay" and rafay_api_key_file:
+    if provisioner == "rafay_eksabm_cluster" and rafay_api_key_file:
         # Copy the rafay apikey to the instance
         print(f"\n[+] Preparing credentials : {rafay_api_key_file}")
         ssh_copy(rafay_api_key_file, remote_staging_dir, remote_host, remote_port, remote_username, "", remote_private_key_path)
@@ -280,11 +280,11 @@ def check_file_path(file_path):
 
 def check_all_input_file_paths(input_data):
     all_paths = []
-    cluster_provisioner = input_data["cluster_provisioner"]
-    cluster_provisioner_data = input_data["cluster_provisioner_config"][cluster_provisioner]
+    provisioner = input_data["provisioner"]
+    provisioner_config = input_data["provisioner_config"][provisioner]
    
-    if cluster_provisioner == "rafay":     
-        all_paths.append(cluster_provisioner_data["rafay_api_key_file"])
+    if provisioner == "rafay_eksabm_cluster":     
+        all_paths.append(provisioner_config["rafay_api_key_file"])
     
     infrastructure_provider = input_data["infrastructure_provider"]
     infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
@@ -363,12 +363,12 @@ if __name__ == "__main__":
     tf_dir = f"{tf_dir_prefix}/{infrastructure_provider}"
     tf_out_json_file = f"{tf_dir}/terraform_output.json"
 
-    cluster_provisioner = input_data["cluster_provisioner"]
-    print(f"\n[+] Detected cluster provisioner: {cluster_provisioner}")
+    provisioner = input_data["provisioner"]
+    print(f"\n[+] Detected cluster provisioner: {provisioner}")
 
-    cluster_provisioner_data = input_data["cluster_provisioner_config"][cluster_provisioner]
-    if cluster_provisioner == "rafay":
-        rafay_api_key_file = cluster_provisioner_data["rafay_api_key_file"]
+    provisioner_config = input_data["provisioner_config"][provisioner]
+    if provisioner == "rafay_eksabm_cluster":
+        rafay_api_key_file = provisioner_config["rafay_api_key_file"]
 
 
     print(f"\n[+] Launching infrastructure on provider {infrastructure_provider}")

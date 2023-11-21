@@ -1,54 +1,94 @@
-clusters:
-  - cluster_name: "brave"
-    operation_type: "provision"
-    k8s_version: "1.27"
-    num_control_plane_nodes: 1
-    num_worker_nodes: 1
+# Infrastructure provider  !! CHANGE THIS TO YOUR INFRASTRUCTURE PROVIDER (aws, oci or infra_exists) 
+infrastructure_provider: aws 
 
-# To create cluster using config file (advanced cluster configuration):
-# clusters:    
-#   - cluster_name: "brave-cluster"
-#     operation_type: "provision"
-#     config_file_name: "eksa-bm-config.yaml"
-
-
-# Cluster provisioner configuration
-cluster_provisioner: native # !! CHANGE THIS TO YOUR PROVISIONER (native, rafay or none) 
-cluster_provisioner_config:
-  native:
-    config: none
-  rafay:
-    #rafay_controller_url: "https://console.rafay.dev/"
-    #rafay_api_key_file: "/home/rgill/oci_api.key"
-    #rafay_project_name: "brave"
-    #rafay_eksabm_gateway_name: "brave-gw"
-  none:
-    #config: none
-
-# Infrastructure provider configuration
-infrastructure_provider: aws # !! CHANGE THIS TO YOUR INFRASTRUCTURE PROVIDER (aws, oci or infra_exists) 
 infrastructure_provider_config:
+# AWS infrastructure provider configuration
   aws:
     region: "us-west-1"
     host_name: "brave-node"
     instance_type: "c5n.metal" #Choose a metal instance type
     ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE= rgill@Robbies-MBP"
     ssh_key_name: "eksabmsshkey"
-    ssh_private_key_file: "/home/ubuntu/keys/brave-key"    
+    ssh_private_key_file: "/opt/rafay/keys/oci"    
+
+# OCI infrastructure provider configuration
   oci:
-    #host_name: "brave-node"
-    #instance_flex_memory_in_gbs: 64
-    #instance_flex_ocpus: 4    
-    #ssh_private_key_file: "/home/ubuntu/keys/brave-key"
-    #ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE= rgill@Robbies-MBP"
-    #region: "us-phoenix-1"
-    #tenancy_ocid: "ocid1.tenancy.oc1..aaaaaaaaaa3ghjcqbrbzmssbzhxzhxf24rpmuyxbaxwcj2axwoqkpd56ljkq"
-    #user_ocid: "ocid1.user.oc1..aaaaaaaac6nqpe4rsz3em53qtkkfq2pd4otg3j347wgku6eidkfcf5tr7kta"
-    #private_key_path: "/Users/rgill/.oci/oci_api_key.pem" # private key for OCI user
-    #fingerprint: "ed:8b:e9:3c:72:4c:39:70:20:0b:97:9e:59:fb:60:e9"
+    host_name: "brave-node"
+    instance_flex_memory_in_gbs: 64
+    instance_flex_ocpus: 4    
+    ssh_private_key_file: "/opt/rafay/keys/oci"
+    ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE= rgill@Robbies-MBP"
+    region: "us-phoenix-1"
+    tenancy_ocid: "ocid1.tenancy.oc1..aaaaaaaaaa3ghjcqbrbzmssbzhxzhxf24rpmuyxbaxwcj2axwoqkpd56ljkq"
+    user_ocid: "ocid1.user.oc1..aaaaaaaac6nqpe4rsz3em53qtkkfq2pd4otg3j347wgku6eidkfcf5tr7kta"
+    private_key_path: "/Users/rgill/.oci/oci_api_key.pem" # private key for OCI user
+    fingerprint: "ed:8b:e9:3c:72:4c:39:70:20:0b:97:9e:59:fb:60:e9"
+
+# "Infrastructure exists" provider configuration
   infra_exists:
-    #ssh_host_ip: "129.146.86.26"
-    #ssh_username: "ubuntu"
-    #ssh_private_key_file: "/home/ubuntu/keys/brave-key"
-    #ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE= rgill@Robbies-MBP"
-    #host_name: "brave-node"
+    ssh_host_ip: "129.146.86.26"
+    ssh_username: "ubuntu"
+    ssh_private_key_file: "/home/ubuntu/keys/brave-key"
+    ssh_public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr/bRBFgLj5l7JiX/0H0uqLUa50x14iWXGKxrqjzPy5UYP9mIqLS4udxf5uvTpB5QsWp9Xn0r3gch0es8QVSG8g0aEHjRhxMD3sW/KhpU4fvCMXLa/ccVQA7OvvYmaoc4aKQXk/kksNQE68+UaVd/gClMq4TMlDH0KlJUADZ3+ZduBKTjKYcme24QD7wHEMipFLuA+NZ0DeMgBlU9zqVI5RX9PW+jheKzII+LZywDlSocNIxoWvgTUJAil1GUlqzWngLZiMBd1xfuJ9BahwlridMOtpbGnamHbZbfE7KKY+eiazfpTERO/T9SYJE/c2U468mO1eggRQjdw0GfcxMgy1ppcL0R80qkxtWxkFaWWxLx1Rh0BO1f+VuRuJiTdOdymmttCqBnCGmsSjIf8zmDr+r1Xmgs3W1KevIyCgezCLhdGPXFkXRAD2VDW1Qo26BDqmhv39M2CPXXil0ifMsdd0T4nIiguaAF4vzYPmmcajCyWNLqaZv4TqBFSwKN6+YE= rgill@Robbies-MBP"
+    host_name: "brave-node"
+
+
+
+# provisioner !! CHANGE THIS TO YOUR PROVISIONER (vm_only, eksabm_cluster, rafay_eksabm_cluster, or none) 
+provisioner: eksabm_cluster 
+
+provisioner_config:
+# VM Provisioner configuration
+  vm_only:
+    - name: "vm1"
+      count: 3
+      cpu:
+      mem:
+      vagrant_image: "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210430"
+    - name: "vm2"
+      count: 3
+      cpu:
+      mem:
+      vagrant_image: "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20210430"
+
+# EKSA-BM Provisioner configuration
+  eksabm_cluster:
+    cluster_name: "brave"
+    operation_type: "provision"
+    k8s_version: "1.27"
+    num_control_plane_nodes: 1
+    num_worker_nodes: 1      
+
+# Rafay EKSA-BM Provisioner configuration
+  rafay_eksabm_cluster:
+    cluster_name: "brave"
+    operation_type: "provision"
+    k8s_version: "1.27"
+    num_control_plane_nodes: 1
+    num_worker_nodes: 1
+    rafay_controller_url: "https://console.rafay.dev/"
+    rafay_api_key_file: "/home/rgill/oci_api.key"
+    rafay_project_name: "brave"
+    rafay_eksabm_gateway_name: "brave-gw"  
+
+
+# None Provisioner 
+  none:
+    config: none
+
+  # To create eksabm cluster using config file (advanced cluster configuration): 
+  # eksabm_cluster:
+  #   cluster_name: "brave-cluster"
+  #   operation_type: "provision"
+  #   config_file_name: "eksa-bm-config.yaml"      
+
+  # To create rafay eksabm cluster using config file (advanced cluster configuration):
+  # rafay_eksabm_cluster:
+  #   cluster_name: "brave-rafay-cluster"
+  #   operation_type: "provision"
+  #   config_file_name: "rafay-eksa-bm-config.yaml" 
+  #   rafay_controller_url: "https://console.rafay.dev/"
+  #   rafay_api_key_file: "/home/rgill/oci_api.key"
+  #   rafay_project_name: "brave"
+  #   rafay_eksabm_gateway_name: "brave-gw"     
+

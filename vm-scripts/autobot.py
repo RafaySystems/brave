@@ -1172,7 +1172,7 @@ def run_local_command(command):
         print(process.stderr)
     return process.returncode
     
-def get_cp_vms_count(cluster_name):
+def get_eksabm_cp_vms_count(cluster_name):
     get_cp_count_cmd=f'sudo ls {vm_dir}/{cluster_name} | grep {cluster_name}-cp-n | wc -l'
     try:
         process = subprocess.run(get_cp_count_cmd, shell=True, capture_output=True, text=True)
@@ -1190,7 +1190,7 @@ def get_cp_vms_count(cluster_name):
     
     return cp_count_cluster
 
-def get_dp_vms_count(cluster_name):
+def get_eksabm_dp_vms_count(cluster_name):
     get_dp_count_cmd=f'sudo ls {vm_dir}/{cluster_name} | grep {cluster_name}-dp-n | wc -l'
     try:
         process = subprocess.run(get_dp_count_cmd, shell=True, capture_output=True, text=True)
@@ -1208,9 +1208,9 @@ def get_dp_vms_count(cluster_name):
     
     return dp_count_cluster
 
-def validate_vms_presence(cp_count, dp_count, cluster_name):
-    cp_count_cluster = get_cp_vms_count(cluster_name)
-    dp_count_cluster = get_dp_vms_count(cluster_name)
+def validate_eksabm_vms_presence(cp_count, dp_count, cluster_name):
+    cp_count_cluster = get_eksabm_cp_vms_count(cluster_name)
+    dp_count_cluster = get_eksabm_dp_vms_count(cluster_name)
 
     if cp_count_cluster == cp_count and dp_count_cluster == dp_count:
         return True
@@ -1225,32 +1225,31 @@ def vbox_vms_dependencies(cp_count, dp_count, cluster_name):
         print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
-    #vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/install-vbox-vagrant.sh > {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo bash {staging_dir}/vm-scripts/create-network.sh  >> {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo bash {staging_dir}/vm-scripts/launch-admin-vm.sh  >> {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo bash {staging_dir}/vm-scripts/launch-cluster-vms.sh -n {cluster_name} -c {cp_count} -d {dp_count}  >> {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo chmod -R 744 /root/eksa/"
     print(f"\n[+] Creating vbox network. This step may take a while, please be patient....")
-    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/create-network.sh > {staging_dir}/create-network.log 2>&1; cat {staging_dir}/create-network.log"
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/create-eksabm-network.sh > {staging_dir}/create-eksabm-network.log 2>&1; cat {staging_dir}/create-eksabm-network.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
         print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
-def create_admin_vm():
+def create_eksabm_admin_vm():
     print(f"\n[+] Creating eksa admin vm. This step may take a while, please be patient...")
-    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-admin-vm.sh > {staging_dir}/launch-admin-vm.log 2>&1; cat {staging_dir}/launch-admin-vm.log"
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-eksabm-admin-vm.sh > {staging_dir}/launch-eksabm-admin-vm.log 2>&1; cat {staging_dir}/launch-eksabm-admin-vm.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
         print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
-def create_cp_dp_vms(cp_count, dp_count, cluster_name):
+def create_eksabm_cp_dp_vms(cp_count, dp_count, cluster_name):
     print(f"\n[+] Creating control plane vms. This step may take a while, please be patient...")
-    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-cluster-vms.sh -n {cluster_name} -c {cp_count} -d 0 > {staging_dir}/launch-cluster-vms-cp.log 2>&1; cat {staging_dir}/launch-cluster-vms-cp.log"
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-eksabm-cluster-vms.sh -n {cluster_name} -c {cp_count} -d 0 > {staging_dir}/launch-eksabm-cluster-vms-cp.log 2>&1; cat {staging_dir}/launch-eksabm-cluster-vms-cp.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
         print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
     print(f"\n[+] Creating data plane vms. This step may take a while, please be patient...")
-    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-cluster-vms.sh -n {cluster_name} -c 0 -d {dp_count} > {staging_dir}/launch-cluster-vms-dp.log 2>&1; cat {staging_dir}/launch-cluster-vms-dp.log"
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-eksabm-cluster-vms.sh -n {cluster_name} -c 0 -d {dp_count} > {staging_dir}/launch-eksabm-cluster-vms-dp.log 2>&1; cat {staging_dir}/launch-eksabm-cluster-vms-dp.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
         print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
@@ -1274,26 +1273,26 @@ def launch_eksabm_vbox_vms(input_data):
 
     operation_type = provisioner_config["operation_type"]
     
-    already_vms_created = validate_vms_presence(cp_count, dp_count, cluster_name)
+    already_vms_created = validate_eksabm_vms_presence(cp_count, dp_count, cluster_name)
     if already_vms_created:
         print(f"vms already created, skipping")
         return
 
     if operation_type == "provision":
         vbox_vms_dependencies(cp_count, dp_count, cluster_name)
-        create_admin_vm()
+        create_eksabm_admin_vm()
         computed_cp_count=cp_count
         computed_dp_count=dp_count
     elif operation_type == "upgrade":
-        current_cp_count=get_cp_vms_count(cluster_name)
-        current_dp_count=get_dp_vms_count(cluster_name)
+        current_cp_count=get_eksabm_cp_vms_count(cluster_name)
+        current_dp_count=get_eksabm_dp_vms_count(cluster_name)
         computed_cp_count=cp_count-current_cp_count
         computed_dp_count=dp_count-current_dp_count
         if computed_cp_count <= 0 or computed_dp_count <= 0:
             print(f"\nERROR:: CP / DP VMs count are invalid")
             sys.exit(1)
 
-    create_cp_dp_vms(cp_count, dp_count, cluster_name)
+    create_eksabm_cp_dp_vms(cp_count, dp_count, cluster_name)
     
 # using rafay provisioner
 def eksabm_rafay_provisioner(input_data):
@@ -1990,7 +1989,7 @@ if __name__ == "__main__":
     
     elif provisioner == "none":
         # Process "vm_only" provisioner
-        print(f"\n[+] Detected none provisioner.")
+        print(f"\n[+] Detected none provisioner. :EXITING:")
     
     else:
-        print(f"\n[+] Detected Unsupported provisioner: {provisioner}")
+        print(f"\n[+] Detected Unsupported provisioner: {provisioner} :EXITING:")

@@ -103,7 +103,7 @@ def get_project_id(rafay_controller_url, project_name, headers, seq=1):
             if result["name"] == project_name:
                 return result["id"]
     
-    print(f"\nERROR: Project id retrieval failed. Exiting... project_name:{project_name}")
+    print(f"\nERROR:: Project id retrieval failed. Exiting... project_name:{project_name}")
     sys.exit(1)
 
 def get_gateway(rafay_controller_url, headers, gw_name, project_id, seq=1):

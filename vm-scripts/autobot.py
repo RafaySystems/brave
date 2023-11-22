@@ -64,10 +64,10 @@ def execute_remote_command(host, port, username, password, command):
         error = stderr.read().decode('utf-8')
 
     except paramiko.AuthenticationException:
-        print(f"ERROR: SSH authentication failed to eksa-admin host {host}:{port} username:{username}")
+        print(f"ERROR:: SSH authentication failed to eksa-admin host {host}:{port} username:{username}")
         sys.exit(1)
     except paramiko.SSHException as ssh_exception:
-        print(f"ERROR: SSH error when connecting to eksa-admin host {host}:{port} username:{username} error: {ssh_exception}")
+        print(f"ERROR:: SSH error when connecting to eksa-admin host {host}:{port} username:{username} error: {ssh_exception}")
         sys.exit(1)
     finally:
         ssh_client.close()
@@ -158,7 +158,7 @@ def get_project_id(rafay_controller_url, project_name, headers, seq=1):
             if result["name"] == project_name:
                 return result["id"]
     
-    print(f"\nERROR: Project id retrieval failed. Exiting... project_name:{project_name}")
+    print(f"\nERROR:: Project id retrieval failed. Exiting... project_name:{project_name}")
     sys.exit(1)
 
     
@@ -184,7 +184,7 @@ def create_gateway(rafay_controller_url, headers, gw_name, gw_type, gw_descripti
         #print("Response Status Code:", resp.status_code)
         #print("Response JSON:", resp.json())
     else:
-        print(f"\nERROR: Gateway creation failed. Exiting... gw_name:{gw_name}, gw_type:{gw_type}, gw_description:{gw_description}, project_id:{project_id}")
+        print(f"\nERROR:: Gateway creation failed. Exiting... gw_name:{gw_name}, gw_type:{gw_type}, gw_description:{gw_description}, project_id:{project_id}")
         sys.exit(1)
 
     return resp
@@ -221,7 +221,7 @@ def get_gateway_setup_cmd(rafay_controller_url, headers, gw_name, project_id, se
             print(f"\n[{seq}.] Gateway setupCommand retrieval successful \n {setup_command}")
             return setup_command
     else:
-        print("\nERROR: Gateway setup command retrieval failed. Exiting ...")
+        print("\nERROR:: Gateway setup command retrieval failed. Exiting ...")
         sys.exit(1)
     
     return None
@@ -232,7 +232,7 @@ def execute_gateway_setup_cmd(host, port, username, password, setup_command, seq
     full_command = f"sudo su -c '{setup_command}'"
     stdout,err = execute_remote_command(host, port, username, password, full_command)
     if err:
-        print(f"\nERROR: Executing gateway setup_command failed. err: {err}")
+        print(f"\nERROR:: Executing gateway setup_command failed. err: {err}")
         sys.exit(1)
     else:
         print(f"\n[{seq}.] Gateway setup command execution successful. stdout: {stdout}")
@@ -259,13 +259,13 @@ def check_gateway_infraagent_status(host, port, username, password, seq=1):
     full_command = f"sudo su -c '{shell_command}'"
     stdout,err = execute_remote_command(host, port, username, password, full_command)
     if err:
-        print(f"\nERROR: Executing command to check gateway infraagent service status failed. err: {err}")
+        print(f"\nERROR:: Executing command to check gateway infraagent service status failed. err: {err}")
         sys.exit(1)
     else:
         if "active (running)" in stdout:
             print(f"\n[{seq}.] Gateway infraagent service is active and running")
         else:
-            print(f"\nnERROR: Gateway infraagent service is NOT ACTIVE or encountered an error. {stdout}")
+            print(f"\nnERROR:: Gateway infraagent service is NOT ACTIVE or encountered an error. {stdout}")
             sys.exit(1)
         
 # check gateway health
@@ -286,9 +286,10 @@ def check_gateway_status(rafay_controller_url, headers, gw_name, project_id, seq
                 print(f"\n[{seq}.] Gateway status is UNHEALTHY. Reason:{gw_health_reason}.")
                 i+=1
                 if i == 4:
+                    print(f"\nERROR:: [{seq}.] Gateway status is UNHEALTHY. Exiting!!")
                     sys.exit(1)
                 else:
-                    time.sleep(5)
+                    time.sleep(25)
             else:
                 print(f"\n[{seq}.] Gateway status is HEALTHY.")
                 return True
@@ -377,7 +378,7 @@ def create_eksabm_cluster(rafay_controller_url, headers,cluster_name, project_id
         #print("Response Status Code:", resp.status_code)
         #print("Response JSON:", resp.json())
     else:
-        print(f"\nERROR: Cluster creation failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}")
+        print(f"\nERROR:: Cluster creation failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}")
         sys.exit(1)
 
     return resp
@@ -468,7 +469,7 @@ def build_eksabm_cluster_update_data_dict(rafay_controller_url, headers, gw_name
     if get_gateway_resp_json:
         gateway_id = get_gateway_resp_json["metadata"]["id"]
     else:
-        print(f"\nERROR: Unable to get gateway details. Exiting ... gw_name:{gw_name}, project_id:{project_id}")
+        print(f"\nERROR:: Unable to get gateway details. Exiting ... gw_name:{gw_name}, project_id:{project_id}")
         sys.exit(1)
 
     hardware_entries = parse_hardware_csv_file(hardware_csv_location)
@@ -643,7 +644,7 @@ def build_eksabm_cluster_update_data_dict(rafay_controller_url, headers, gw_name
         get_cluster_resp_json["spec"] = updated_spec_data["spec"]
 
     else:
-        print(f"\nERROR: Unable to get cluster details. Exiting ... cluster_name:{cluster_name}, project_id:{project_id}")
+        print(f"\nERROR:: Unable to get cluster details. Exiting ... cluster_name:{cluster_name}, project_id:{project_id}")
         sys.exit(1)    
     
 
@@ -903,7 +904,7 @@ def update_eksabm_cluster(rafay_controller_url, headers,cluster_name, project_id
         #print("Response Status Code:", resp.status_code)
         #print("Response JSON:", resp.json())
     else:
-        print(f"\nERROR: Cluster update failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}")
+        print(f"\nERROR:: Cluster update failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}")
         sys.exit(1)
 
     return resp
@@ -954,7 +955,7 @@ def monitor_eksabm_cluster_status_progress(rafay_controller_url, headers, condit
                     conditions_status_dict[cnd_type] = [cnd_status,cnd_reason]
                     # Exit if any cluster status condition has failed 
                     if cnd_status == 'Failure':
-                        print(f"\nERROR: Cluster {target_condition_type} failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}. Cluster status condition type:{cnd_type}, status:{cnd_status}, reason:{cnd_reason}")
+                        print(f"\nERROR:: Cluster {target_condition_type} failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}. Cluster status condition type:{cnd_type}, status:{cnd_status}, reason:{cnd_reason}")
                         print_cluster_condition_status_summary(conditions_type_list,conditions_status_dict)
                         sys.exit(1)
 
@@ -1181,10 +1182,10 @@ def get_cp_vms_count(cluster_name):
         cp_count_cluster = int(output)
         print(f'cp count {cp_count_cluster}')
     except subprocess.CalledProcessError as e:
-        print(f"ERROR: encountered error while checking existing cp vms: {e}, ignoring and continuing with cp vms creation")
+        print(f"ERROR:: encountered error while checking existing cp vms: {e}, ignoring and continuing with cp vms creation")
         sys.exit(0)
     except ValueError as e:
-        print(f"ERROR: encountered error while checking existing cp vms: {e}, ignoring and continuing with cp vms creation")
+        print(f"ERROR:: encountered error while checking existing cp vms: {e}, ignoring and continuing with cp vms creation")
         sys.exit(0)
     
     return cp_count_cluster
@@ -1199,10 +1200,10 @@ def get_dp_vms_count(cluster_name):
         dp_count_cluster = int(output)
         print(f'dp count {dp_count_cluster}')
     except subprocess.CalledProcessError as e:
-        print(f"ERROR: encountered error while checking existing dp vms: {e}, ignoring and continuing with dp vms creation")
+        print(f"ERROR:: encountered error while checking existing dp vms: {e}, ignoring and continuing with dp vms creation")
         sys.exit(0)
     except ValueError as e:
-        print(f"ERROR: encountered error while checking existing dp vms: {e}, ignoring and continuing with dp vms creation")
+        print(f"ERROR:: encountered error while checking existing dp vms: {e}, ignoring and continuing with dp vms creation")
         sys.exit(0)
     
     return dp_count_cluster
@@ -1221,7 +1222,7 @@ def vbox_vms_dependencies(cp_count, dp_count, cluster_name):
     vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/install-vbox-vagrant.sh > {staging_dir}/install-vbox-vagrant.log 2>&1; cat {staging_dir}/install-vbox-vagrant.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
     #vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/install-vbox-vagrant.sh > {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo bash {staging_dir}/vm-scripts/create-network.sh  >> {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo bash {staging_dir}/vm-scripts/launch-admin-vm.sh  >> {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo bash {staging_dir}/vm-scripts/launch-cluster-vms.sh -n {cluster_name} -c {cp_count} -d {dp_count}  >> {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo chmod -R 744 /root/eksa/"
@@ -1229,7 +1230,7 @@ def vbox_vms_dependencies(cp_count, dp_count, cluster_name):
     vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/create-network.sh > {staging_dir}/create-network.log 2>&1; cat {staging_dir}/create-network.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
 def create_admin_vm():
@@ -1237,7 +1238,7 @@ def create_admin_vm():
     vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-admin-vm.sh > {staging_dir}/launch-admin-vm.log 2>&1; cat {staging_dir}/launch-admin-vm.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
 def create_cp_dp_vms(cp_count, dp_count, cluster_name):
@@ -1245,14 +1246,14 @@ def create_cp_dp_vms(cp_count, dp_count, cluster_name):
     vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-cluster-vms.sh -n {cluster_name} -c {cp_count} -d 0 > {staging_dir}/launch-cluster-vms-cp.log 2>&1; cat {staging_dir}/launch-cluster-vms-cp.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
     print(f"\n[+] Creating data plane vms. This step may take a while, please be patient...")
     vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-cluster-vms.sh -n {cluster_name} -c 0 -d {dp_count} > {staging_dir}/launch-cluster-vms-dp.log 2>&1; cat {staging_dir}/launch-cluster-vms-dp.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
 # launch vbox vms 
@@ -1268,7 +1269,7 @@ def launch_eksabm_vbox_vms(input_data):
     dp_count = provisioner_config["num_worker_nodes"]
 
     if cp_count <= 0 or dp_count <= 0:
-        print(f"\nERROR: CP and DP VMs count cannot be 0 or negative")
+        print(f"\nERROR:: CP and DP VMs count cannot be 0 or negative")
         sys.exit(1)
 
     operation_type = provisioner_config["operation_type"]
@@ -1289,7 +1290,7 @@ def launch_eksabm_vbox_vms(input_data):
         computed_cp_count=cp_count-current_cp_count
         computed_dp_count=dp_count-current_dp_count
         if computed_cp_count <= 0 or computed_dp_count <= 0:
-            print(f"\nERROR: CP / DP VMs count are invalid")
+            print(f"\nERROR:: CP / DP VMs count are invalid")
             sys.exit(1)
 
     create_cp_dp_vms(cp_count, dp_count, cluster_name)
@@ -1313,6 +1314,7 @@ def eksabm_rafay_provisioner(input_data):
         k8s_version = provisioner_config["k8s_version"]
         cp_count = provisioner_config["num_control_plane_nodes"]
         dp_count = provisioner_config["num_worker_nodes"]
+        cluster_yaml = None 
 
     else:
         cluster_name = provisioner_config["cluster_name"]
@@ -1320,13 +1322,13 @@ def eksabm_rafay_provisioner(input_data):
         provisioner_by_yaml_file=get_provisioner_by_yaml_file(cluster_yaml_file)
 
         if provisioner_by_yaml_file is None or provisioner_by_yaml_file != provisioner:
-            print(f'\nERROR: cluster file of cluster {cluster_name} does not match with yaml file format of {provisioner}, exiting !!')
+            print(f'\nERROR:: cluster file of cluster {cluster_name} does not match with yaml file format of {provisioner}, exiting !!')
             sys.exit(1)
 
         if os.path.exists(cluster_yaml_file):
                 k8s_version,cp_count,dp_count,cluster_yaml = extract_cluster_details_from_cluster_yaml(cluster_yaml_file,provisioner)
         else:
-            print(f"\nERROR: cluster file {cluster_yaml_file} does not exist for cluster {cluster_name}")
+            print(f"\nERROR:: cluster file {cluster_yaml_file} does not exist for cluster {cluster_name}")
             sys.exit(1)
 
  
@@ -1438,7 +1440,7 @@ def eksctl_create_cluster(cluster_dir, cluster_name, eksa_admin_ip, eksa_admin_p
     full_command = f"sudo su -c '{eksctl_cluster_create_cmd}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to create cluster failed. err: {err}")
+        print(f"\nERROR:: Execution of command to create cluster failed. err: {err}")
         sys.exit(1)
     else:
         print(f"Execution of command to create cluster passed. stdout:\n {stdout}")
@@ -1463,6 +1465,7 @@ def eksabm_native_provisioner(input_data):
         k8s_version = provisioner_config["k8s_version"]
         cp_count = provisioner_config["num_control_plane_nodes"]
         dp_count = provisioner_config["num_worker_nodes"]
+        cluster_yaml = None 
 
     else:
         cluster_name = provisioner_config["cluster_name"]
@@ -1470,13 +1473,13 @@ def eksabm_native_provisioner(input_data):
         provisioner_by_yaml_file=get_provisioner_by_yaml_file(cluster_yaml_file)
 
         if provisioner_by_yaml_file is None or provisioner_by_yaml_file != provisioner:
-            print(f'\nERROR: cluster file of cluster {cluster_name} does not match with yaml file format of {provisioner}, exiting !!')
+            print(f'\nERROR:: cluster file of cluster {cluster_name} does not match with yaml file format of {provisioner}, exiting !!')
             sys.exit(1)
 
         if os.path.exists(cluster_yaml_file):
                 k8s_version,cp_count,dp_count,cluster_yaml = extract_cluster_details_from_cluster_yaml(cluster_yaml_file,provisioner)
         else:
-            print(f"\nERROR: cluster file {cluster_yaml_file} does not exist for cluster {cluster_name}")
+            print(f"\nERROR:: cluster file {cluster_yaml_file} does not exist for cluster {cluster_name}")
             sys.exit(1)
 
 
@@ -1526,7 +1529,7 @@ def eksabm_native_provisioner(input_data):
     full_command = f"sudo su -c '{create_dir_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to create cluster directory failed. err: {err}")
+        print(f"\nERROR:: Execution of command to create cluster directory failed. err: {err}")
         sys.exit(1)
 
 
@@ -1538,7 +1541,7 @@ def eksabm_native_provisioner(input_data):
     full_command = f"sudo su -c '{echo_hardware_csv_content_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to create hardware csv failed. err: {err}")
+        print(f"\nERROR:: Execution of command to create hardware csv failed. err: {err}")
         sys.exit(1)
     
     # Step 3. create cluster config file
@@ -1564,7 +1567,7 @@ def eksabm_native_provisioner(input_data):
     full_command = f"sudo su -c '{install_eksctl_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to install eksctl cli failed. err: {err}")
+        print(f"\nERROR:: Execution of command to install eksctl cli failed. err: {err}")
         sys.exit(1)
 
     # Step 5. install yq
@@ -1573,7 +1576,7 @@ def eksabm_native_provisioner(input_data):
     full_command = f"sudo su -c '{install_yq_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err and 'https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64' not in err:
-        print(f"\nERROR: Execution of command to install yq cli failed. err: {err}")
+        print(f"\nERROR:: Execution of command to install yq cli failed. err: {err}")
         sys.exit(1)
     
     # Step 6. install eksctl anywhere
@@ -1582,7 +1585,7 @@ def eksabm_native_provisioner(input_data):
     full_command = f"sudo su -c '{install_eksctl_anywhere_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to install eksctl anywhere plugin failed. err: {err}")
+        print(f"\nERROR:: Execution of command to install eksctl anywhere plugin failed. err: {err}")
         sys.exit(1)
 
 
@@ -1592,7 +1595,7 @@ def eksabm_native_provisioner(input_data):
     full_command = f"sudo su -c '{install_kubectl_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err and '% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current' not in err:
-        print(f"\nERROR: Execution of command to install kubectl cli failed. err: {err}")
+        print(f"\nERROR:: Execution of command to install kubectl cli failed. err: {err}")
         sys.exit(1)
 
 
@@ -1602,7 +1605,7 @@ def eksabm_native_provisioner(input_data):
     full_command = f"sudo su -c '{install_docker_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     # if err:
-    #     print(f"\nERROR: Execution of command to install docker failed. err: {err}")
+    #     print(f"\nERROR:: Execution of command to install docker failed. err: {err}")
     #     # sys.exit(1)
     # else:
     #     print(f"\nExecution of command to install docker passed. stdout: {stdout}")
@@ -1620,7 +1623,7 @@ def eksabm_native_provisioner(input_data):
         full_command = f"sudo su -c '{fetch_cluster_creation_logs_command}'"
         stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
         if err and 'No such file or directory' not in err:
-            print(f"\nERROR: Execution of command to fetch cluster creation logs failed. err: {err}")
+            print(f"\nERROR:: Execution of command to fetch cluster creation logs failed. err: {err}")
             sys.exit(1)
         else:
             print(f"   [+] Execution of command to fetch cluster creation logs passed. stdout:\n {stdout}")
@@ -1674,7 +1677,7 @@ def eksabm_native_provisioner(input_data):
         full_command = f"sudo su -c '{fetch_cluster_creation_logs_command}'"
         stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
         if err and 'No such file or directory' not in err:
-            print(f"\nERROR: Execution of command to fetch cluster creation logs failed. err: {err}")
+            print(f"\nERROR:: Execution of command to fetch cluster creation logs failed. err: {err}")
             sys.exit(1)
         else:
             print(f"   [+] Execution of command to fetch cluster creation logs passed. stdout: {stdout}")

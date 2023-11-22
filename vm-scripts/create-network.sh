@@ -49,7 +49,7 @@ mkdir -p ${VM_DIR}
 
 echo -e "[+] Creating natnetwork eksa-net with cidr ${EKSA_NET} and gateway ${GATEWAY}"
 VBoxManage natnetwork add --netname eksa-net --network "${EKSA_NET}" --enable --dhcp off
-[ $? -ne 0 ] && exit_out "Detected an error...exiting!!"
+[ $? -ne 0 ] && exit_out "ERROR:: Detected an error...exiting!!"
 
 VBoxManage natnetwork start --netname eksa-net
 

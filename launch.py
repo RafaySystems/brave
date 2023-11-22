@@ -100,10 +100,10 @@ def execute_remote_command(host, port, username, password, command, ssh_private_
         print(f"\n[+] Executed on remote host: {host} command: {command} stdout: {output} stderr: {error}")
 
     except paramiko.AuthenticationException:
-        print(f"SSH authentication failed to eksa-admin host {host}:{port} username:{username}")
+        print(f"ERROR:: SSH authentication failed to eksa-admin host {host}:{port} username:{username}")
         sys.exit(1)
     except paramiko.SSHException as ssh_exception:
-        print(f"SSH error when connecting to eksa-admin host {host}:{port} username:{username} error: {ssh_exception}")
+        print(f"ERROR:: SSH error when connecting to eksa-admin host {host}:{port} username:{username} error: {ssh_exception}")
         sys.exit(1)
     finally:
         ssh_client.close()
@@ -139,7 +139,7 @@ def execute_remote_command_shell(hostname, port, username, password, command, ss
         # Read and print the output from the command
         while True:
             output = ssh_session.recv(1024).decode('utf-8')
-            if ('Cluster created' in output) or ('Traceback' in output) or ('ERROR' in output):
+            if ('Cluster created' in output) or ('Traceback' in output) or ('ERROR::' in output):
                 print(output, end='')
                 ssh_session.close()
                 client.close()
@@ -296,7 +296,7 @@ def check_all_input_file_paths(input_data):
     
     for file_path in all_paths:
         if not check_file_path(file_path):
-            print(f"the file path '{file_path}' does not exist.")
+            print(f"ERROR:: the file path '{file_path}' does not exist.")
             sys.exit(1)
 
 
@@ -378,7 +378,7 @@ if __name__ == "__main__":
         remote_host = launch_infra_on_cloud_provider(tf_dir)
         host_name = input_data["infrastructure_provider_config"]["oci"]["host_name"]
         ssh_private_key_file = input_data["infrastructure_provider_config"]["oci"]["ssh_private_key_file"]
-        #remote_host='141.148.174.92'
+        #remote_host='144.24.3.64'
         print(f"\n[+] Waiting 5 minutes to allow infrastructure to boot up on {infrastructure_provider}")
         import time
         time.sleep(60*5)  

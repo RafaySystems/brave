@@ -29,7 +29,7 @@ nuke_vm(){
         then
             echo -e "[+] Executing vagrant destroy in vm folder ${VM_FOLDER}" && cd ${VM_FOLDER} && vagrant destroy -f && cd .. && rm -rf ${VM_FOLDER}
         else
-            exit_out "Detected an error... vagrant directory for ${VM} does not exist. Could not delete vm"
+            exit_out "ERROR:: Detected an error... vagrant directory for ${VM} does not exist. Could not delete vm"
         fi
         
         echo -e "[+] Removing entry for ${VM} from hardware.csv file ${VM_CLUSTER_FOLDER}/generated_hardware.csv"
@@ -39,7 +39,7 @@ nuke_vm(){
         sed -i "/$VM/d" ${GLOBAL_ALLOCATION_TABLE}
 
     else
-        exit_out "Detected an error... vm ${VM} does not exist."
+        exit_out "ERROR:: Detected an error... vm ${VM} does not exist."
     fi 
 
 }

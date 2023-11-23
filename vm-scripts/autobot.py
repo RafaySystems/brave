@@ -12,7 +12,8 @@ import threading
 staging_dir="/opt/rafay"
 input_yaml = f"{staging_dir}/input.yaml"
 tf_dir_prefix = "tf"   
-vm_dir='/root/eksa/vms'
+eksa_vm_dir='/root/eksa/vms'
+vm_dir='/root/vm/vms'
 valid_operations=["provision", "upgrade", "scale"]
 conditions_type_list = ["ClusterInitialized","ClusterBootstrapNodeInitialized","ClusterEKSCTLInstalled","ClusterHardwareCSVCreated","ClusterConfigCreated","ClusterSpecApplied","ClusterControlPlaneReady","ClusterWorkerNodeGroupsReady","ClusterOperatorSpecApplied","ClusterHealthy","ClusterUpgraded"]
 
@@ -1173,7 +1174,7 @@ def run_local_command(command):
     return process.returncode
     
 def get_eksabm_cp_vms_count(cluster_name):
-    get_cp_count_cmd=f'sudo ls {vm_dir}/{cluster_name} | grep {cluster_name}-cp-n | wc -l'
+    get_cp_count_cmd=f'sudo ls {eksa_vm_dir}/{cluster_name} | grep {cluster_name}-cp-n | wc -l'
     try:
         process = subprocess.run(get_cp_count_cmd, shell=True, capture_output=True, text=True)
         output = process.stdout
@@ -1191,7 +1192,7 @@ def get_eksabm_cp_vms_count(cluster_name):
     return cp_count_cluster
 
 def get_eksabm_dp_vms_count(cluster_name):
-    get_dp_count_cmd=f'sudo ls {vm_dir}/{cluster_name} | grep {cluster_name}-dp-n | wc -l'
+    get_dp_count_cmd=f'sudo ls {eksa_vm_dir}/{cluster_name} | grep {cluster_name}-dp-n | wc -l'
     try:
         process = subprocess.run(get_dp_count_cmd, shell=True, capture_output=True, text=True)
         output = process.stdout
@@ -1216,6 +1217,29 @@ def validate_eksabm_vms_presence(cp_count, dp_count, cluster_name):
         return True
     
     return False
+
+
+def validate_vms_presence(vm_count, vm_name_prefix):
+
+    get_vm_count_cmd=f'sudo ls {vm_dir} | grep {vm_name_prefix} | wc -l'
+    try:
+        process = subprocess.run(get_vm_count_cmd, shell=True, capture_output=True, text=True)
+        output = process.stdout
+        if process.returncode != 0:
+            print(f'encountered error while checking existing vms: {process.stderr}, ignoring and continuing with vm creation')
+        vm_present_count = int(output)
+        print(f'vm count {vm_count}')
+    except subprocess.CalledProcessError as e:
+        print(f"ERROR encountered error while checking existing vms: {e}, ignoring and continuing with vm creation")
+
+    except ValueError as e:
+        print(f"ERROR encountered error while checking existing vms: {e}, ignoring and continuing with vm creation")
+ 
+    if vm_present_count == vm_count:
+        return True
+    
+    return False
+
 
 def eksabm_vbox_vms_dependencies(cp_count, dp_count, cluster_name): 
     print(f"\n[+] Installing vbox. This step may take a while, please be patient.....")
@@ -1255,7 +1279,7 @@ def create_eksabm_cp_dp_vms(cp_count, dp_count, cluster_name):
         print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
-# launch vbox vms 
+# launch vbox vms for eksabm clusters
 def launch_eksabm_vbox_vms(input_data):
     
     #infrastructure_provider = input_data["infrastructure_provider"]
@@ -1293,7 +1317,89 @@ def launch_eksabm_vbox_vms(input_data):
             sys.exit(1)
 
     create_eksabm_cp_dp_vms(cp_count, dp_count, cluster_name)
+
+
+def vbox_vms_dependencies(): 
+    print(f"\n[+] Installing vbox. This step may take a while, please be patient.....")
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/install-vbox-vagrant.sh > {staging_dir}/install-vbox-vagrant.log 2>&1; cat {staging_dir}/install-vbox-vagrant.log"
+    ret_code = run_local_command(vms_launch_cmd)
+    if ret_code != 0:
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
+        sys.exit(1)
+
+    print(f"\n[+] Creating vm vbox network. This step may take a while, please be patient....")
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/create-vm-network.sh > {staging_dir}/create-vm-network.log 2>&1; cat {staging_dir}/create-vm-network.log"
+    ret_code = run_local_command(vms_launch_cmd)
+    if ret_code != 0:
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
+        sys.exit(1)
+
+def create_vms(vm_name, vm_count, vm_cpu, vm_mem, vm_os_family, vm_vagrant_box):
+    print(f"\n[+] Creating vms. This step may take a while, please be patient...")
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-vms.sh -n {vm_name} -c {vm_count} -p {vm_cpu} -m {vm_mem} -o {vm_os_family} -i {vm_vagrant_box}  > {staging_dir}/launch-vms.log 2>&1; cat {staging_dir}/launch-vms.log"
+    ret_code = run_local_command(vms_launch_cmd)
+    if ret_code != 0:
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
+        sys.exit(1)
+
+# launch vbox vms for vms_only
+def launch_vbox_vms(input_data):
+   
+    vm_name=vm_os_family=vm_vagrant_box=""
+    vm_count=vm_cpu=vm_mem=0
+
+    #infrastructure_provider = input_data["infrastructure_provider"]
+    #infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
+    provisioner = input_data["provisioner"]
+    provisioner_config = input_data["provisioner_config"][provisioner]
+
+    # Default values
+    default_values = {
+        'count': 1,
+        'cpu': 2,
+        'mem': 16384,
+        'osfamily': 'ubuntu',
+        'vagrant_box': 'bento/ubuntu-20.04'
+    }
+    # loop over provisioner_config array and launch vms
+    for vm in provisioner_config:
+            vm_name = vm.get('name')
+            vm_count = vm.get('count', default_values['count'])
+            vm_cpu = vm.get('cpu', default_values['cpu'])
+            vm_mem = vm.get('mem', default_values['mem'])
+            vm_os_family = vm.get('osfamily', default_values['osfamily'])
+            vm_vagrant_box = vm.get('vagrant_image', default_values['vagrant_box'])
+
+            if vm_name is None:
+                print(f"\nERROR:: vm name cannot be empty")
+                sys.exit(1)
+
+            if vm_count <= 0:
+                print(f"\nERROR:: vm count cannot be 0 or negative")
+                sys.exit(1)
+
+            if vm_cpu <= 0:
+                print(f"\nERROR:: vm cpu cannot be 0 or negative")
+                sys.exit(1)
+
+            if vm_mem <= 0:
+                print(f"\nERROR:: vm memory cannot be 0 or negative")
+                sys.exit(1)
+
+            print(f"\n[+] Detected vm config:: vm_name: {vm_name}, vm_count:{vm_count}, vm_cpu:{vm_cpu}, vm_mem:{vm_mem}, vm_os_family:{vm_os_family}, vm_vagrant_box:{vm_vagrant_box}")
+
     
+            already_vms_created = validate_vms_presence(vm_name, vm_count)
+            if already_vms_created:
+                print(f"vms already created, skipping")
+                continue
+
+            vbox_vms_dependencies()
+            create_vms(vm_name, vm_count, vm_cpu, vm_mem, vm_os_family, vm_vagrant_box)
+
+
+
+
 # using rafay provisioner
 def eksabm_rafay_provisioner(input_data):
     
@@ -1357,9 +1463,9 @@ def eksabm_rafay_provisioner(input_data):
     gw_description = gw_name
     gw_type = 'eksaBareMetal'
     
-    hardware_csv_location=f"{vm_dir}/{cluster_name}/generated_hardware.csv"
-    cluster_tinkerbell_ip_file=f"{vm_dir}/{cluster_name}/tinkerbell_ip"
-    cluster_endpoint_ip_file=f"{vm_dir}/{cluster_name}/endpoint_ip"   
+    hardware_csv_location=f"{eksa_vm_dir}/{cluster_name}/generated_hardware.csv"
+    cluster_tinkerbell_ip_file=f"{eksa_vm_dir}/{cluster_name}/tinkerbell_ip"
+    cluster_endpoint_ip_file=f"{eksa_vm_dir}/{cluster_name}/endpoint_ip"   
     project_id = get_project_id(rafay_controller_url, rafay_project_name, headers, seq=1)
     
     # Copy the ssh_private_key_file file to the instance
@@ -1488,9 +1594,9 @@ def eksabm_native_provisioner(input_data):
     eksa_admin_port = 5022  # eksa_admin node ssh port 
     eksa_admin_username = "vagrant"
     eksa_admin_password = "vagrant"
-    hardware_csv_location=f"{vm_dir}/{cluster_name}/generated_hardware.csv"
-    cluster_tinkerbell_ip_file=f"{vm_dir}/{cluster_name}/tinkerbell_ip"
-    cluster_endpoint_ip_file=f"{vm_dir}/{cluster_name}/endpoint_ip"   
+    hardware_csv_location=f"{eksa_vm_dir}/{cluster_name}/generated_hardware.csv"
+    cluster_tinkerbell_ip_file=f"{eksa_vm_dir}/{cluster_name}/tinkerbell_ip"
+    cluster_endpoint_ip_file=f"{eksa_vm_dir}/{cluster_name}/endpoint_ip"   
 
     cluster_dir=f"{staging_dir}/native/{cluster_name}"
     remote_hardware_csv_location=f"{cluster_dir}/hardware.csv"
@@ -1983,12 +2089,12 @@ if __name__ == "__main__":
         # elif operation_type == "upgrade": # upgrade is untested
             #upgrade_cluster(cluster_provision_ctx)
     
-    elif provisioner == "vm_only":
-        # Process "vm_only" provisioner
-        pass
+    elif provisioner == "vms_only":
+        # Launch virtual infrastructure using vagrant and Virtualbox for vms_only provisioner
+        launch_vbox_vms(input_data)
     
     elif provisioner == "none":
-        # Process "vm_only" provisioner
+        # Process "vms_only" provisioner
         print(f"\n[+] Detected none provisioner. :EXITING:")
     
     else:

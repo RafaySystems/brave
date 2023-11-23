@@ -192,12 +192,12 @@ launch-ubuntu-vm() {
 pre-checks
 
 # Check if VM_NAME is already present in ${GLOBAL_ALLOCATION_TABLE}
-grep -q ${VMS_NAME} ${GLOBAL_ALLOCATION_TABLE}
-if [ $? -eq 0 ]
-then
-    echo -e "[+] ERROR:: Detected an error...${VMS_NAME} already exists in ${GLOBAL_ALLOCATION_TABLE}. Please choose another name. Exiting"
-    exit 1
-fi
+#grep -q ${VMS_NAME} ${GLOBAL_ALLOCATION_TABLE}
+#if [ $? -eq 0 ]
+#then
+#    echo -e "[+] ERROR:: Detected an error...${VMS_NAME} already exists in ${GLOBAL_ALLOCATION_TABLE}. Please choose another name. Exiting"
+#    exit 1
+#fi
 
 CNT=0
 [ ${VM_COUNT} -eq 0 ] && exit 0

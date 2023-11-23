@@ -139,7 +139,7 @@ def execute_remote_command_shell(hostname, port, username, password, command, ss
         # Read and print the output from the command
         while True:
             output = ssh_session.recv(1024).decode('utf-8')
-            if ('Cluster created' in output) or ('Traceback' in output) or ('ERROR::' in output) or (':EXITING:' in output):
+            if ('Cluster created' in output) or ('Traceback' in output) or ('ERROR::' in output) or (':EXITING:' in output) or ('vms launched.' in output):
                 print(output, end='')
                 ssh_session.close()
                 client.close()

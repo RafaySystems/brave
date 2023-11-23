@@ -46,6 +46,9 @@ flush-iptables
 
 mkdir -p ${VM_DIR}
 
+VBoxManage list natnetworks | grep  -q vm-net
+[ $? -eq 0 ] && exit_out "Detected existing network vm-net..."
+
 echo -e "[+] Creating natnetwork vm-net with cidr ${VM_NET} and gateway ${GATEWAY}"
 VBoxManage natnetwork add --netname vm-net --network "${VM_NET}" --enable --dhcp off
 [ $? -ne 0 ] && exit_out "ERROR:: Detected an error...exiting!!"

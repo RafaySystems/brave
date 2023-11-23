@@ -1235,6 +1235,8 @@ def validate_vms_presence(vm_count, vm_name_prefix):
     except ValueError as e:
         print(f"ERROR encountered error while checking existing vms: {e}, ignoring and continuing with vm creation")
  
+    print(f'[+] Checking if vm {vm_name_prefix} has been launched {vm_count} times already. Detected it has been launched {vm_present_count} times already')
+    
     if vm_present_count == vm_count:
         return True
     
@@ -1335,12 +1337,53 @@ def vbox_vms_dependencies():
         sys.exit(1)
 
 def create_vms(vm_name, vm_count, vm_cpu, vm_mem, vm_os_family, vm_vagrant_box):
-    print(f"\n[+] Creating vms. This step may take a while, please be patient...")
+    print(f"\n[+] Creating {vm_count} vms of name {vm_name}. This step may take a while, please be patient...")
     vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-vms.sh -n {vm_name} -c {vm_count} -p {vm_cpu} -m {vm_mem} -o {vm_os_family} -i {vm_vagrant_box}  > {staging_dir}/launch-vms.log 2>&1; cat {staging_dir}/launch-vms.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
         print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
+
+
+def get_vms_ips():
+    global_allocation_table=f"{vm_dir}/global_allocation_table"
+    get_vms_ips_cmd=f'sudo cat {global_allocation_table}'
+    try:
+        process = subprocess.run(get_vms_ips_cmd, shell=True, capture_output=True, text=True)
+        output = process.stdout
+        if process.returncode != 0:
+            print(f'ERROR:: encountered error while checking vms ips: {process.stderr}')
+        
+        output_lines = output.strip().split('\n')
+        vms_map = {}
+        
+        for line in output_lines:
+            fields = line.split(',')
+            key = fields[0]
+            values = fields[1:]
+    
+            value_map = {
+                'MAC': values[0],
+                'IP': values[1],
+                'Port': values[2]
+            }
+
+            # Update vms_map with key as vm_name and value as value_map containing MAC, IP and Port
+            vms_map[key] = value_map
+
+        print(f"\n[+] Processed global allocation table {global_allocation_table} and detected below vms:")
+        for key, values in vms_map.items():
+            print(f"vm_name: {key}, vm_details: {values}")
+
+    except subprocess.CalledProcessError as e:
+        print(f"ERROR:: encountered error while checking vms ips: {e}")
+        sys.exit(1)
+    except ValueError as e:
+        print(f"ERROR:: encountered error while checking vms ips: {e}")
+        sys.exit(1)
+    
+    return vms_map
+
 
 # launch vbox vms for vms_only
 def launch_vbox_vms(input_data):
@@ -1348,8 +1391,10 @@ def launch_vbox_vms(input_data):
     vm_name=vm_os_family=vm_vagrant_box=""
     vm_count=vm_cpu=vm_mem=0
 
-    #infrastructure_provider = input_data["infrastructure_provider"]
-    #infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
+    infrastructure_provider = input_data["infrastructure_provider"]
+    infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
+    ssh_public_key = infrastructure_provider_data["ssh_public_key"]
+
     provisioner = input_data["provisioner"]
     provisioner_config = input_data["provisioner_config"][provisioner]
 
@@ -1361,6 +1406,9 @@ def launch_vbox_vms(input_data):
         'osfamily': 'ubuntu',
         'vagrant_box': 'bento/ubuntu-20.04'
     }
+    
+    vbox_vms_dependencies()
+
     # loop over provisioner_config array and launch vms
     for vm in provisioner_config:
             vm_name = vm.get('name')
@@ -1389,16 +1437,39 @@ def launch_vbox_vms(input_data):
             print(f"\n[+] Detected vm config:: vm_name: {vm_name}, vm_count:{vm_count}, vm_cpu:{vm_cpu}, vm_mem:{vm_mem}, vm_os_family:{vm_os_family}, vm_vagrant_box:{vm_vagrant_box}")
 
     
-            already_vms_created = validate_vms_presence(vm_name, vm_count)
+            already_vms_created = validate_vms_presence(vm_count, vm_name)
             if already_vms_created:
                 print(f"vms already created, skipping")
                 continue
 
-            vbox_vms_dependencies()
             create_vms(vm_name, vm_count, vm_cpu, vm_mem, vm_os_family, vm_vagrant_box)
 
+    # After vm creation, collect IP details from Global Allocation Table    
+    vms_ip_details = get_vms_ips()
+    vm_username='vagrant'
+    vm_password='vagrant'
+    
+    # loop over vms_ip_details array and populate authorized_keys file for ssh access
+    for vm in vms_ip_details.keys():
+            vm_ipaddr = vms_ip_details[vm]['IP']
+            vm_macaddr = vms_ip_details[vm]['MAC']
+            vm_local_forwarded_port = vms_ip_details[vm]['Port']
+
+            print(f"\n[+] vms created:: vm_name: {vm}, vm_ip:{vm_ipaddr}, vm_mac:{vm_macaddr}, vm_local_forwarded_port:{vm_local_forwarded_port}")
+
+            # Create ssh config entry for vms node on local machine
+            ssh_config_entry=f"\n\nHost {vm}\n  HostName 127.0.0.1\n  User vagrant\n  Port {vm_local_forwarded_port}\n  IdentityFile {staging_dir}/ssh_private_key_file\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null\n"
+            with open("/home/ubuntu/.ssh/config", "a") as ssh_config_file:
+                    ssh_config_file.write(ssh_config_entry)
+
+            # Copy ssh_public key to authorized keys of vm
+            print(f"\n[+] Copying ssh_public key to authorized keys of vm {vm}")
+
+            full_command = f"echo {ssh_public_key} > /home/vagrant/.ssh/authorized_keys; echo {ssh_public_key} >> /home/vagrant/ssh_public_key; chmod 600 /home/vagrant/ssh_private_key_file"
+            stdout,err = execute_remote_command('127.0.0.1', vm_local_forwarded_port, vm_username, vm_password, full_command)
 
 
+    print(f"\n[+] vms launched. To ssh to vms, run 'ssh <vm_name>' from cloud instance\n\n")
 
 # using rafay provisioner
 def eksabm_rafay_provisioner(input_data):

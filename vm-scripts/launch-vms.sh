@@ -53,9 +53,9 @@ fi
 [ -z $VM_OS_FAMILY ] && VM_OS_FAMILY="ubuntu"
 
 
-VM_DIR='/root/vm/vms'
-NETWORK_CONFIG_FILE="${VM_DIR}/network_config"
-GLOBAL_ALLOCATION_TABLE="${VM_DIR}/global_allocation_table"
+VM_BASE_DIR='/root/vm/vms'
+NETWORK_CONFIG_FILE="${VM_BASE_DIR}/network_config"
+GLOBAL_ALLOCATION_TABLE="${VM_BASE_DIR}/global_allocation_table"
 VM_NET=$(grep 'NetworkCidr' ${NETWORK_CONFIG_FILE}  | awk -F':' '{print $2}')
 GATEWAY=$(grep 'NetworkGateway' ${NETWORK_CONFIG_FILE}   | awk -F':' '{print $2}')
 
@@ -118,7 +118,7 @@ launch-ubuntu-vm() {
     VM_NAME=${1}
     VM_IP=${2}
     VM_MAC_ADDR=${3}
-    VM_DIR="${VM_DIR}/${VM_NAME}/"
+    VM_DIR="${VM_BASE_DIR}/${VM_NAME}/"
     VM_MAC_ADDR_CONCISE=`echo $VM_MAC_ADDR | sed -e 's/://g'`
     
     # extract last octet of the IP address and use that as local port forward padded in front by digit 3 to make it 4 digits
@@ -183,11 +183,21 @@ launch-ubuntu-vm() {
     [ $? -ne 0 ] && exit_out 'ERROR:: Detected an error...exiting!!'
 
     echo -e "\t[+] Please wait for ${VM_NAME} vm to come up and then run ssh ${VM_NAME}"
-
+    echo
+    echo
+    cd - > /dev/null 2>&1
 }
 
 
 pre-checks
+
+# Check if VM_NAME is already present in ${GLOBAL_ALLOCATION_TABLE}
+grep -q ${VMS_NAME} ${GLOBAL_ALLOCATION_TABLE}
+if [ $? -eq 0 ]
+then
+    echo -e "[+] ERROR:: Detected an error...${VMS_NAME} already exists in ${GLOBAL_ALLOCATION_TABLE}. Please choose another name. Exiting"
+    exit 1
+fi
 
 CNT=0
 [ ${VM_COUNT} -eq 0 ] && exit 0

@@ -1217,7 +1217,7 @@ def validate_eksabm_vms_presence(cp_count, dp_count, cluster_name):
     
     return False
 
-def vbox_vms_dependencies(cp_count, dp_count, cluster_name): 
+def eksabm_vbox_vms_dependencies(cp_count, dp_count, cluster_name): 
     print(f"\n[+] Installing vbox. This step may take a while, please be patient.....")
     vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/install-vbox-vagrant.sh > {staging_dir}/install-vbox-vagrant.log 2>&1; cat {staging_dir}/install-vbox-vagrant.log"
     ret_code = run_local_command(vms_launch_cmd)
@@ -1279,7 +1279,7 @@ def launch_eksabm_vbox_vms(input_data):
         return
 
     if operation_type == "provision":
-        vbox_vms_dependencies(cp_count, dp_count, cluster_name)
+        eksabm_vbox_vms_dependencies(cp_count, dp_count, cluster_name)
         create_eksabm_admin_vm()
         computed_cp_count=cp_count
         computed_dp_count=dp_count

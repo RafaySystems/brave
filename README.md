@@ -6,15 +6,14 @@
 - [Overview](#overview)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Supported Infrastructure Providers and Provisioners]
 - [Supported Use Cases](#supported-use-cases)
-     - [Supported Infrastructure Providers and Provisioners]
      - [Deploying VMs on a Cloud Instance]
-     - [EKSA Bare Metal Kubernetes Cluster Creation using VMs]
+     - [EKSA Bare Metal Kubernetes Cluster Creation]
          - [How `b.r.a.v.e` creates EKSA-BM Cluster](#how-brave-works)
          - [Power Management Algorithm For EKSA-BM](#power-management-algorithm)
          - [Accessing EKSA-BM Cluster](#accessing-cluster)
          - [Advanced Usage, Debugging and VM Management](#vm-management-debugging-and-advanced-usage)         
-     - [EKSA Bare Metal Cluster Creation using VMs and a Rafay Controller]
 
 ---
 ## Overview
@@ -114,11 +113,10 @@ source venv/bin/activate
 
 ---
 
-##  Supported Use Cases 
+## Supported Infrastructure Providers and Provisioners
 
 `b.r.a.v.e` supports virtualization of a number of bare metal deployment use cases. To support these, a number of `infrastructure_provider` and  `provisioner` options are exposed which can be used in any combination to fit a particular bare metal deployment use case.  
 
-### Supported Infrastructure Providers and Provisioners
 
 Three **`infrastructure_provider`** options are currently supported: 
 
@@ -143,25 +141,83 @@ Supported **`provisioner`** options are :
 **Note**: Refer to [discussion on structure of `input.yaml`](docs/input-yaml.md)  for further details. 
 
 
+---
+
+##  Supported Use Cases 
+
 `b.r.a.v.e` facilitates a spectrum of automated workflows through its provisioners. Below is a discussion of these provisioners and the use cases they support in detail.
 
 
 ### Deploying VMs on a Cloud Instance  
 
+Most conventional bare metal deployments encompass a small network of interconnected servers capable of direct communication among themselves and with external networks through a designated gateway. However, setting up non-production replicas of such deployments for testing, evaluations, demonstrations, or development purposes can become cost-prohibitive, primarily due to hardware specifications.
+
+`b.r.a.v.e` offers a solution to virtualize these deployments, substantially reducing costs and hardware requirements. This is achieved by employing Virtualbox and vagrant managed VMs to replicate bare metal servers and utilizing Virtualbox networking capabilities to establish the necessary networking infrastructure within a single cloud instance, available on supported public clouds. All essential software and packages are automatically installed on this cloud instance.
+
+
+As an example, below excerpt of `input.yaml` instructs `b.r.a.v.e` to 
+- Provision a cloud instance in OCI public cloud (`infrastructure_provider` is set as `oci`)
+- Deploy total 3 Virtualbox VMs on this instance (`provisioner` is set as `vms_only`):
+     - 2x ubuntu 20.04 VMs with name *workers* and capacity cpu=3vcpus and memory=16GB. These VMs will be named `workers-1` and `workers-2`
+     - 1x ubuntu 20.04 VM with name *storage* and capacity cpu=2vcpus and memory=16GB. This VM will be named `storage-1`. 
+
+```sh
+infrastructure_provider: oci  
+infrastructure_provider_config:
+  oci:
+    host_name: "brave-node"
+    .....
+    .....
+
+provisioner: vms_only 
+provisioner_config:
+# VM Provisioner configuration
+  vms_only:
+    - name: "workers"
+      count: 2
+      cpu: 3       # in vcpus 
+      mem: 16384   # in MB 
+      osfamily: ubuntu # currently only ubuntu is supported
+      vagrant_box: "bento/ubuntu-20.04"
+    - name: "storage"
+      #count: 1             # (default value)
+      #cpu: 2               # (default value)
+      #mem: 16384           # (default value)
+      #osfamily: ubuntu     # (default value)
+      #vagrant_box: "bento/ubuntu-20.04"  # (default value)
+```
+
+####  Accessing VMs and Debugging
+
+Virtualbox VMs are allocated static IPs just like bare metal servers would and ssh connectivity is automatically programmed so that all VMs can be logged into from the cloud instance. For instance, to access VMs created in example [above](#deploying-vms-on-a-cloud-instance) :
+
+1. SSH to the cloud instance. An entry should already have been created in your ~/.ssh/config. Example entry:
+```sh
+Host brave-node
+  Hostname 129.153.193.176
+  StrictHostKeyChecking no
+  IdentityFile /opt/rafay/keys/oci
+  User ubuntu
+```
+To ssh simply use something like `ssh brave-node`
+
+2. From the cloud instance, ssh to the VM by name. You can check the contents of `/home/ubuntu/.ssh/config` for name of VMs
+
+```sh
+cat /home/ubuntu/.ssh/config
+ssh workers-1
+```
 
 
 ###  EKSA Bare Metal Kubernetes Cluster Creation using VMs 
 
-EKS Anywhere Bare Metal (EKSA-BM) Kubernetes cluster creation can be non trivial and cost prohibitive for certain non production use cases as there are extensive [hardware and networking requirements](docs/eksabm-pre-reqs.md) to meet. Such use cases include:
+EKS Anywhere Bare Metal (EKSA-BM) Kubernetes cluster creation can be non trivial and cost prohibitive for certain non production use cases as there are extensive [hardware and networking requirements](docs/eksabm-pre-reqs.md) to meet.  
 
-- conducting quick proof of concepts, demos or experiments using a **dispensable lab**
+`b.r.a.v.e`  makes it possible to create non production EKSA-BM clusters without having access to specialized hardware or networking setup. With `b.r.a.v.e` , extensive [hardware and networking requirements](docs/eksabm-pre-reqs.md) of an EKSA-BM cluster are reduced to just a **single** requirement :
 
-- setting up relatively cheap development, debugging and automated **testbed environments**. 
-
-**`b.r.a.v.e`** addresses these use cases and makes it possible to create non production EKSA-BM clusters without having access to specialized hardware or networking setup. With **`b.r.a.v.e`** , extensive [hardware and networking requirements](docs/eksabm-pre-reqs.md) of an EKSA-BM cluster are reduced to just a **single** requirement :
 - Having permission to launch a **single cloud instance** in a supported cloud provider (AWS and OCI are currently supported). 
 
-**`b.r.a.v.e`** can:
+`b.r.a.v.e` can:
 1. Launch an instance in a cloud provider.
 2. Inside this cloud instance, create all infrastructure required for supporting an EKSA-BM cluster. This includes vms to emulate the machines and the network.  
 3. Using this virtual infrastructure, create an EKSA-BM cluster **without any power management support** (fully automated end to end). 
@@ -169,11 +225,11 @@ EKS Anywhere Bare Metal (EKSA-BM) Kubernetes cluster creation can be non trivial
 Since entire infrastructure is contained within a single cloud instance, the entire infrastructure can be shut down by just stopping the cloud instance. This is not only convenient (no hardware required) but also cost effective.  Simply start the instance back up when you wish to restart the cluster.  
 
 
-#### How `brave` creates EKSA Bare Metal Kubernetes Cluster 
+#### How `b.r.a.v.e` creates EKSA Bare Metal Kubernetes Cluster 
 
 ![EKSA BM setup using brave](docs/eksabm-network.jpg)
 
-**`b.r.a.v.e`** simplifies EKSA-BM cluster creation by emulating the entire networking and bare metal setup required for creating EKSA-BM clusters on a **single cloud instance** of a cloud provider. **`b.r.a.v.e`** achieves this by:
+`b.r.a.v.e` simplifies EKSA-BM cluster creation by emulating the entire networking and bare metal setup required for creating EKSA-BM clusters on a **single cloud instance** of a cloud provider. `b.r.a.v.e` achieves this by:
 
 1. `Creating a cloud instance` on a supported cloud or infrastructure provider. [Terraform](https://www.terraform.io/) is used to power this functionality. (A pre-existing compute instance can also be used). Currently supported infrastructure providers are [Oracle Cloud Infrastructure (OCI)](https://www.oracle.com/au/cloud/) and [Amazon Web Services](https://aws.amazon.com/).    
 
@@ -188,6 +244,35 @@ Since entire infrastructure is contained within a single cloud instance, the ent
 4. Automatically handling `power management of cluster machines WITHOUT a BMC controller by watching relevant cluster events` and performing power on and off of vms via VBoxManage cli. (See [below](#power-management-algorithm))
 
 **Note**: End to end creation of cluster (including time to create cloud instance) can be range anywhere between 30 to 50 minutes. Please be patient. 
+
+```sh
+infrastructure_provider: oci  
+infrastructure_provider_config:
+  oci:
+    host_name: "brave-node"
+    ....
+    ....
+
+provisioner: eksabm_cluster 
+provisioner_config:
+  eksabm_cluster:
+    cluster_name: "brave"
+    operation_type: "provision"
+    k8s_version: "1.27"
+    num_control_plane_nodes: 1
+    num_worker_nodes: 1    
+```
+
+Also possile 
+
+```sh
+provisioner: eksabm_cluster 
+provisioner_config:
+  eksabm_cluster:
+    cluster_name: "brave-cluster"
+    operation_type: "provision"
+    config_file_name: "eksa-bm-config.yaml"    
+```
 
 Refer to [VM Management, Debugging and Advanced Usage](docs/vm-mgmt.md) doc for more details. 
 
@@ -276,11 +361,3 @@ Refer to this [VM Management, Debugging and Advanced Usage](docs/vm-mgmt.md) doc
 
 ---
 
-
-## Beyond EKSA Bare Metal
-
-`brave` can be configured to fire up a cloud instance and launch Virtualbox vms and a network on this cloud instance, where vms are able to communicate on same layer2 network and also reach the Internet.  This infrastructure setup can be used for any number of use cases well beyond EKSA Bare Metal Kubernetes cluster provisioning. 
-
-In this manner `b.r.a.v.e` can truly be used as a generic `Bare Metal Replication And Virtualization Environment`. Refer to [VM management, debugging and advanced usage section](#vm-management-debugging-and-advanced-usage) for how to ssh to virtualbox vms and get a look under the hood for adapting `b.r.a.v.e` for your use case.   
-
-To enable this behaviour, set `infrastructure_provider` to `aws`, `oci` or `infra_exists` and set `cluster_provisioner` as `none`.

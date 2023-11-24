@@ -379,9 +379,9 @@ if __name__ == "__main__":
         host_name = input_data["infrastructure_provider_config"]["oci"]["host_name"]
         ssh_private_key_file = input_data["infrastructure_provider_config"]["oci"]["ssh_private_key_file"]
         #remote_host='144.24.3.64'
-        print(f"\n[+] Waiting 5 minutes to allow infrastructure to boot up on {infrastructure_provider}")
+        print(f"\n[+] Waiting 2 minutes to allow infrastructure to boot up on {infrastructure_provider}")
         import time
-        time.sleep(60*5)  
+        time.sleep(60*2)  
     elif infrastructure_provider == "infra_exists":
         remote_host = input_data["infrastructure_provider_config"]["infra_exists"]["ssh_host_ip"] 
         host_name = input_data["infrastructure_provider_config"]["infra_exists"]["host_name"]
@@ -392,9 +392,9 @@ if __name__ == "__main__":
         host_name = input_data["infrastructure_provider_config"]["aws"]["host_name"]
         ssh_private_key_file = input_data["infrastructure_provider_config"]["aws"]["ssh_private_key_file"]
         #remote_host='141.148.174.92'       
-        print(f"\n[+] Waiting 5 minutes to allow infrastructure to boot up on {infrastructure_provider}")
+        print(f"\n[+] Waiting 2 minutes to allow infrastructure to boot up on {infrastructure_provider}")
         import time
-        time.sleep(60*5)          
+        time.sleep(60*2)          
     
     update_ssh_config_entry(host_name, remote_host, ssh_private_key_file)
     

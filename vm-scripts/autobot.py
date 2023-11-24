@@ -1462,6 +1462,10 @@ def launch_vbox_vms(input_data):
             with open("/home/ubuntu/.ssh/config", "a") as ssh_config_file:
                     ssh_config_file.write(ssh_config_entry)
 
+            print(f"\n[+] Waiting 1 minute to allow vm {vm} to boot up")
+            import time
+            time.sleep(60*2) 
+                        
             # Copy ssh_public key to authorized keys of vm
             print(f"\n[+] Copying ssh_public key to authorized keys of vm {vm}")
 

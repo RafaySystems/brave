@@ -92,7 +92,7 @@ ubuntu@ip-10-10-10-34:~$ cd /opt/rafay/; sudo python3 vm-scripts/autobot.py
 
 [+] Processing input file /opt/rafay/input.yaml
 
-[+] Detected cluster provisioner: native
+[+] Detected cluster provisioner: eksabm_cluster
 cp count 0
 dp count 0
 
@@ -111,7 +111,7 @@ b'[+] Flushing local iptables\n[+] Creating natnetwork eksa-net with cidr 192.16
 
 [+] Copying /opt/rafay/ssh_private_key_file to /home/vagrant/ on 127.0.0.1
 
-[+] Provisioning cluster_name: brave using provisioner native
+[+] Provisioning cluster_name: brave using provisioner eksabm_cluster
 
 [1.] Executing command to create directory on eksa-admin : mkdir -p /opt/rafay/native/brave
 

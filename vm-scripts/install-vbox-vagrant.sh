@@ -8,7 +8,7 @@ exit_out() {
 pre-checks(){
     echo -e "[+] Performing pre checks"
     cat /etc/issue | grep -q 'Ubuntu 20.04'
-    [ $? -ne 0 ] && exit_out "Only supported on Ubuntu 20.04. Exiting!!!" 
+    [ $? -ne 0 ] && exit_out "ERROR:: Only supported on Ubuntu 20.04. Exiting!!!" 
 
 }
 

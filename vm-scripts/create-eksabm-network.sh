@@ -47,9 +47,12 @@ flush-iptables
 
 mkdir -p ${VM_DIR}
 
+VBoxManage list natnetworks | grep  -q eksa-net
+[ $? -eq 0 ] && exit_out "Detected existing network vm-net..."
+
 echo -e "[+] Creating natnetwork eksa-net with cidr ${EKSA_NET} and gateway ${GATEWAY}"
 VBoxManage natnetwork add --netname eksa-net --network "${EKSA_NET}" --enable --dhcp off
-[ $? -ne 0 ] && exit_out "Detected an error...exiting!!"
+[ $? -ne 0 ] && exit_out "ERROR:: Detected an error...exiting!!"
 
 VBoxManage natnetwork start --netname eksa-net
 

@@ -103,7 +103,7 @@ def get_project_id(rafay_controller_url, project_name, headers, seq=1):
             if result["name"] == project_name:
                 return result["id"]
     
-    print(f"\nERROR: Project id retrieval failed. Exiting... project_name:{project_name}")
+    print(f"\nERROR:: Project id retrieval failed. Exiting... project_name:{project_name}")
     sys.exit(1)
 
 def get_gateway(rafay_controller_url, headers, gw_name, project_id, seq=1):
@@ -188,34 +188,34 @@ if __name__ == "__main__":
     # run terraform destroy
     if infrastructure_provider == "oci" or infrastructure_provider == "aws":
         destroy_infra_on_cloud_provider(tf_dir)
-    
-    cluster_provisioner = input_data["cluster_provisioner"]
-    print(f"\n[+] Detected cluster provisioner: {cluster_provisioner}")
 
-    cluster_provisioner_data = input_data["cluster_provisioner_config"][cluster_provisioner]
+    provisioner = input_data["provisioner"]
+    provisioner_config = input_data["provisioner_config"][provisioner]    
+    print(f"\n[+] Detected provisioner: {provisioner}")
     
-    print(f"\n[+] Deleting gateway & cluster on provisioner {cluster_provisioner}")
 
-    if cluster_provisioner == "rafay":
-        rafay_api_key_file = cluster_provisioner_data["rafay_api_key_file"]
+    if provisioner == "rafay_eksabm_cluster":
+        print(f"\n[+] Deleting gateway & cluster on provisioner {provisioner}")
+       
+        rafay_api_key_file = provisioner_config["rafay_api_key_file"]
 
         with open(rafay_api_key_file, 'r') as f:
             rafay_api_key = f.read().strip() 
 
-        rafay_controller_url = cluster_provisioner_data["rafay_controller_url"]
-        gw_name = cluster_provisioner_data["rafay_eksabm_gateway_name"]
-        rafay_project_name = cluster_provisioner_data["rafay_project_name"]
+        rafay_controller_url = provisioner_config["rafay_controller_url"]
+        gw_name = provisioner_config["rafay_eksabm_gateway_name"]
+        rafay_project_name = provisioner_config["rafay_project_name"]
+        cluster_name = provisioner_config["cluster_name"]
 
         headers = {'X-RAFAY-API-KEYID': rafay_api_key,'Content-Type': 'application/json'}
         project_id = get_project_id(rafay_controller_url, rafay_project_name, headers, seq=1)
 
-        clusters = input_data["clusters"]
-        for cluster in clusters:
-            cl = get_cluster(rafay_controller_url, headers, cluster["cluster_name"], project_id)
-            if cl is not None:
-                delete_eksabm_cluster_force(rafay_controller_url, headers, cluster["cluster_name"], project_id)
-            else:
-                print(f'Cluster {gw_name} does not exist')
+
+        cl = get_cluster(rafay_controller_url, headers, cluster_name, project_id)
+        if cl is not None:
+            delete_eksabm_cluster_force(rafay_controller_url, headers, cluster_name, project_id)
+        else:
+            print(f'Cluster {cluster_name} does not exist')
         
         gw = get_gateway(rafay_controller_url, headers, gw_name, project_id)
         if gw is not None:

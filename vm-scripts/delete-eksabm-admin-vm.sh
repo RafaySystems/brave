@@ -29,7 +29,7 @@ nuke_admin_vm(){
         then
             echo -e "[+] Executing vagrant destroy in vm folder ${VM_FOLDER}" && cd ${VM_FOLDER} && vagrant destroy -f && cd .. && rm -rf ${VM_FOLDER}
         else
-            exit_out "Detected an error... vagrant directory for ${VM} does not exist. Could not delete vm"
+            exit_out "ERROR:: Detected an error... vagrant directory for ${VM} does not exist. Could not delete vm"
         fi
 
         echo -e "[+] Removing entry for ${VM} from global_allocation_table ${GLOBAL_ALLOCATION_TABLE}"
@@ -42,7 +42,7 @@ nuke_admin_vm(){
         VBoxManage natnetwork modify --netname eksa-net --port-forward-4 delete ssh-to-${VM}
 
     else
-        exit_out "Detected an error... vm ${VM} does not exist."
+        exit_out "ERROR:: Detected an error... vm ${VM} does not exist."
     fi 
 
 }

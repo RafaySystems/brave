@@ -71,7 +71,7 @@ CLUSTER_ENDPOINT_IP=""
 calc_netmask(){
   cidr=$1
   if [[ ! $cidr =~ ^([0-9]|[1-2][0-9]|3[0-2])$ ]]; then
-    echo "Invalid CIDR notation: $cidr" >&2
+    echo "ERROR:: Invalid CIDR notation: $cidr" >&2
     exit 1
   fi
 
@@ -165,18 +165,18 @@ launch-cp-node-vm() {
     CP_NODE_MAC_ADDR_CONCISE=`echo $CP_NODE_MAC_ADDR | sed -e 's/://g'`
 
     echo -e "[+] Launching cp-node-vm ${CP_NODE_NAME} with IP ${CP_NODE_IP} and MAC ${CP_NODE_MAC_ADDR}"
-    [ -d ${CP_NODE_DIR} ] && exit_out "Detected an error...${CP_NODE_DIR} exists. Exiting"
+    [ -d ${CP_NODE_DIR} ] && exit_out "ERROR:: Detected an error...${CP_NODE_DIR} exists. Exiting"
 
     # Ensure ${CP_NODE_IP} is present in ${GLOBAL_ALLOCATION_TABLE}
     echo -e "${CP_NODE_NAME},${CP_NODE_MAC_ADDR},${CP_NODE_IP}" >> ${GLOBAL_ALLOCATION_TABLE} && echo -e "[+] Updated global allocation table with entry for ${CP_NODE_NAME} vm:  ${CP_NODE_NAME},${CP_NODE_MAC_ADDR},${CP_NODE_IP}"
 
     echo -e "\t[+] Creating and switching to directory ${CP_NODE_DIR}"
     mkdir -p ${CP_NODE_DIR} && cd ${CP_NODE_DIR}
-    [ $? -ne 0 ] && exit_out 'Detected an error...exiting!!'
+    [ $? -ne 0 ] && exit_out 'ERROR:: Detected an error...exiting!!'
 
     echo -e "\t[+] Populate Vagrantfile for cp-node-vm ${CP_NODE_NAME}"
     echo -e  "Vagrant.configure(2) do |config|\n  config.vm.box = 'jtyr/pxe'\n  config.vm.box_check_update = false\n  config.disksize.size = '100GB'\n  config.vm.boot_timeout = 30\n  config.persistent_storage.enabled = true\n  config.persistent_storage.location = \"virtualdrive.vdi\"\n  config.persistent_storage.size = 102400\n  config.persistent_storage.diskdevice = '/dev/sdc'\n  config.persistent_storage.partition = false\n  config.persistent_storage.use_lvm = false\n  config.vm.provider 'virtualbox' do |vb|\n    vb.cpus = ${CP_NODE_VM_CPUS}\n    vb.memory = ${CP_NODE_VM_MEM}\n    vb.name = '${CP_NODE_NAME}'\n    vb.customize ['modifyvm', :id, '--nic1', 'natnetwork', '--nat-network1', 'eksa-net']\n    vb.customize ['modifyvm', :id, '--macaddress1', '${CP_NODE_MAC_ADDR_CONCISE}']\n    vb.customize ['modifyvm', :id, '--boot1', 'net']\n    vb.customize ['modifyvm', :id, '--boot2', 'disk']\n    vb.customize ['modifyvm', :id, '--ostype', 'Linux_64']    \n  end\nend\n\n"  > ./Vagrantfile
-    [ $? -ne 0 ] && exit_out 'Detected an error...exiting!!'
+    [ $? -ne 0 ] && exit_out 'ERROR:: Detected an error...exiting!!'
 
     echo -e "\t[+] Running vagrant up for cp-node-vm ${CP_NODE_NAME}. IGNORE ERROR - Timed out while waiting for the machine to boot."
     vagrant up
@@ -199,18 +199,18 @@ launch-dp-node-vm() {
 
 
     echo -e "[+] Launching dp-node-vm ${DP_NODE_NAME} with IP ${DP_NODE_IP} and MAC ${DP_NODE_MAC_ADDR}"
-    [ -d ${DP_NODE_DIR} ] && exit_out "Detected an error...${DP_NODE_DIR} exists. Exiting"
+    [ -d ${DP_NODE_DIR} ] && exit_out "ERROR:: Detected an error...${DP_NODE_DIR} exists. Exiting"
 
     # Ensure ${DP_NODE_IP} is present in ${GLOBAL_ALLOCATION_TABLE}
     echo -e "${DP_NODE_NAME},${DP_NODE_MAC_ADDR},${DP_NODE_IP}" >> ${GLOBAL_ALLOCATION_TABLE} && echo -e "[+] Updated global allocation table with entry for ${DP_NODE_NAME} vm:  ${DP_NODE_NAME},${DP_NODE_MAC_ADDR},${DP_NODE_IP}"
 
     echo -e "\t[+] Creating and switching to directory ${DP_NODE_DIR}"
     mkdir -p ${DP_NODE_DIR} && cd ${DP_NODE_DIR}
-    [ $? -ne 0 ] && exit_out 'Detected an error...exiting!!'
+    [ $? -ne 0 ] && exit_out 'ERROR:: Detected an error...exiting!!'
 
     echo -e "\t[+] Populate Vagrantfile for dp-node-vm ${DP_NODE_NAME}"
     echo -e  "Vagrant.configure(2) do |config|\n  config.vm.box = 'jtyr/pxe'\n  config.vm.box_check_update = false\n  config.disksize.size = '100GB'\n  config.vm.boot_timeout = 30\n  config.persistent_storage.enabled = true\n  config.persistent_storage.location = \"virtualdrive.vdi\"\n  config.persistent_storage.size = 102400\n  config.persistent_storage.diskdevice = '/dev/sdc'\n  config.persistent_storage.partition = false\n  config.persistent_storage.use_lvm = false\n  config.vm.provider 'virtualbox' do |vb|\n    vb.cpus = ${DP_NODE_VM_CPUS}\n    vb.memory = ${DP_NODE_VM_MEM}\n    vb.name = '${DP_NODE_NAME}'\n    vb.customize ['modifyvm', :id, '--nic1', 'natnetwork', '--nat-network1', 'eksa-net']\n    vb.customize ['modifyvm', :id, '--macaddress1', '${DP_NODE_MAC_ADDR_CONCISE}']\n    vb.customize ['modifyvm', :id, '--boot1', 'net']\n    vb.customize ['modifyvm', :id, '--boot2', 'disk']\n    vb.customize ['modifyvm', :id, '--ostype', 'Linux_64']    \n  end\nend\n\n"  > ./Vagrantfile
-    [ $? -ne 0 ] && exit_out 'Detected an error...exiting!!'
+    [ $? -ne 0 ] && exit_out 'ERROR:: Detected an error...exiting!!'
 
     echo -e "\t[+] Running vagrant up for dp-node-vm ${DP_NODE_NAME}. IGNORE ERROR - Timed out while waiting for the machine to boot."
     vagrant up

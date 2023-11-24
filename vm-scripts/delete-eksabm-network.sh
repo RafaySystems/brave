@@ -16,7 +16,7 @@ echo -e "[+] Detected network config ${NETWORK_CONFIG_FILE}"
 echo 
 echo -e "[+] Deleting network eksa-net"
 VBoxManage natnetwork remove --netname eksa-net 
-[ $? -ne 0 ] && exit_out "Detected an error...exiting!!"
+[ $? -ne 0 ] && exit_out "ERROR:: Detected an error...exiting!!"
 
 rm -rf ${NETWORK_CONFIG_FILE}
 

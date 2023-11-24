@@ -12,7 +12,8 @@ import threading
 staging_dir="/opt/rafay"
 input_yaml = f"{staging_dir}/input.yaml"
 tf_dir_prefix = "tf"   
-vm_dir='/root/eksa/vms'
+eksa_vm_dir='/root/eksa/vms'
+vm_dir='/root/vm/vms'
 valid_operations=["provision", "upgrade", "scale"]
 conditions_type_list = ["ClusterInitialized","ClusterBootstrapNodeInitialized","ClusterEKSCTLInstalled","ClusterHardwareCSVCreated","ClusterConfigCreated","ClusterSpecApplied","ClusterControlPlaneReady","ClusterWorkerNodeGroupsReady","ClusterOperatorSpecApplied","ClusterHealthy","ClusterUpgraded"]
 
@@ -64,10 +65,10 @@ def execute_remote_command(host, port, username, password, command):
         error = stderr.read().decode('utf-8')
 
     except paramiko.AuthenticationException:
-        print(f"SSH authentication failed to eksa-admin host {host}:{port} username:{username}")
+        print(f"ERROR:: SSH authentication failed to eksa-admin host {host}:{port} username:{username}")
         sys.exit(1)
     except paramiko.SSHException as ssh_exception:
-        print(f"SSH error when connecting to eksa-admin host {host}:{port} username:{username} error: {ssh_exception}")
+        print(f"ERROR:: SSH error when connecting to eksa-admin host {host}:{port} username:{username} error: {ssh_exception}")
         sys.exit(1)
     finally:
         ssh_client.close()
@@ -158,7 +159,7 @@ def get_project_id(rafay_controller_url, project_name, headers, seq=1):
             if result["name"] == project_name:
                 return result["id"]
     
-    print(f"\nERROR: Project id retrieval failed. Exiting... project_name:{project_name}")
+    print(f"\nERROR:: Project id retrieval failed. Exiting... project_name:{project_name}")
     sys.exit(1)
 
     
@@ -184,7 +185,7 @@ def create_gateway(rafay_controller_url, headers, gw_name, gw_type, gw_descripti
         #print("Response Status Code:", resp.status_code)
         #print("Response JSON:", resp.json())
     else:
-        print(f"\nERROR: Gateway creation failed. Exiting... gw_name:{gw_name}, gw_type:{gw_type}, gw_description:{gw_description}, project_id:{project_id}")
+        print(f"\nERROR:: Gateway creation failed. Exiting... gw_name:{gw_name}, gw_type:{gw_type}, gw_description:{gw_description}, project_id:{project_id}")
         sys.exit(1)
 
     return resp
@@ -221,7 +222,7 @@ def get_gateway_setup_cmd(rafay_controller_url, headers, gw_name, project_id, se
             print(f"\n[{seq}.] Gateway setupCommand retrieval successful \n {setup_command}")
             return setup_command
     else:
-        print("\nERROR: Gateway setup command retrieval failed. Exiting ...")
+        print("\nERROR:: Gateway setup command retrieval failed. Exiting ...")
         sys.exit(1)
     
     return None
@@ -232,7 +233,7 @@ def execute_gateway_setup_cmd(host, port, username, password, setup_command, seq
     full_command = f"sudo su -c '{setup_command}'"
     stdout,err = execute_remote_command(host, port, username, password, full_command)
     if err:
-        print(f"\nERROR: Executing gateway setup_command failed. err: {err}")
+        print(f"\nERROR:: Executing gateway setup_command failed. err: {err}")
         sys.exit(1)
     else:
         print(f"\n[{seq}.] Gateway setup command execution successful. stdout: {stdout}")
@@ -259,13 +260,13 @@ def check_gateway_infraagent_status(host, port, username, password, seq=1):
     full_command = f"sudo su -c '{shell_command}'"
     stdout,err = execute_remote_command(host, port, username, password, full_command)
     if err:
-        print(f"\nERROR: Executing command to check gateway infraagent service status failed. err: {err}")
+        print(f"\nERROR:: Executing command to check gateway infraagent service status failed. err: {err}")
         sys.exit(1)
     else:
         if "active (running)" in stdout:
             print(f"\n[{seq}.] Gateway infraagent service is active and running")
         else:
-            print(f"\nGateway infraagent service is NOT ACTIVE or encountered an error. {stdout}")
+            print(f"\nnERROR:: Gateway infraagent service is NOT ACTIVE or encountered an error. {stdout}")
             sys.exit(1)
         
 # check gateway health
@@ -286,9 +287,10 @@ def check_gateway_status(rafay_controller_url, headers, gw_name, project_id, seq
                 print(f"\n[{seq}.] Gateway status is UNHEALTHY. Reason:{gw_health_reason}.")
                 i+=1
                 if i == 4:
+                    print(f"\nERROR:: [{seq}.] Gateway status is UNHEALTHY. Exiting!!")
                     sys.exit(1)
                 else:
-                    time.sleep(5)
+                    time.sleep(25)
             else:
                 print(f"\n[{seq}.] Gateway status is HEALTHY.")
                 return True
@@ -377,7 +379,7 @@ def create_eksabm_cluster(rafay_controller_url, headers,cluster_name, project_id
         #print("Response Status Code:", resp.status_code)
         #print("Response JSON:", resp.json())
     else:
-        print(f"\nERROR: Cluster creation failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}")
+        print(f"\nERROR:: Cluster creation failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}")
         sys.exit(1)
 
     return resp
@@ -468,7 +470,7 @@ def build_eksabm_cluster_update_data_dict(rafay_controller_url, headers, gw_name
     if get_gateway_resp_json:
         gateway_id = get_gateway_resp_json["metadata"]["id"]
     else:
-        print(f"\nERROR: Unable to get gateway details. Exiting ... gw_name:{gw_name}, project_id:{project_id}")
+        print(f"\nERROR:: Unable to get gateway details. Exiting ... gw_name:{gw_name}, project_id:{project_id}")
         sys.exit(1)
 
     hardware_entries = parse_hardware_csv_file(hardware_csv_location)
@@ -643,7 +645,7 @@ def build_eksabm_cluster_update_data_dict(rafay_controller_url, headers, gw_name
         get_cluster_resp_json["spec"] = updated_spec_data["spec"]
 
     else:
-        print(f"\nERROR: Unable to get cluster details. Exiting ... cluster_name:{cluster_name}, project_id:{project_id}")
+        print(f"\nERROR:: Unable to get cluster details. Exiting ... cluster_name:{cluster_name}, project_id:{project_id}")
         sys.exit(1)    
     
 
@@ -836,7 +838,7 @@ def update_hardware_details(yaml_file_content, hardware_details, provisioner):
 
     updated_yaml_documents = []
 
-    if provisioner == "rafay":
+    if provisioner == "rafay_eksabm_cluster":
         for doc in yaml_data:
             if doc is not None and "kind" in doc and doc["kind"] == "Cluster":
                 doc["spec"]["config"]["tinkerbellHardwareConfig"] = hardware_details
@@ -851,13 +853,13 @@ def extract_cluster_details_from_cluster_yaml(yaml_file, provisioner):
         yaml_cluster_config = yaml_file.read().strip()
 
     yaml_data = yaml.safe_load_all(yaml_cluster_config)
-    if provisioner == "native":
+    if provisioner == "eksabm_cluster":
         for doc in yaml_data:
             if doc is not None and "kind" in doc and doc["kind"] == "Cluster":
                 kubernetes_version=doc["spec"]["kubernetesVersion"]
                 cp_count=doc["spec"]["controlPlaneConfiguration"]["count"]
                 dp_count=sum(node_group['count'] for node_group in doc['spec']['workerNodeGroupConfigurations'])
-    elif provisioner == "rafay":
+    elif provisioner == "rafay_eksabm_cluster":
         for doc in yaml_data:
             if doc is not None and "kind" in doc and doc["kind"] == "Cluster":
                 kubernetes_version=doc["spec"]["config"]["eksaClusterConfig"]["spec"]["kubernetesVersion"]
@@ -877,9 +879,9 @@ def get_provisioner_by_yaml_file(yaml_file):
             break
     
     if api_version is not None and api_version == "anywhere.eks.amazonaws.com/v1alpha1":
-        return "native"
+        return "eksabm_cluster"
     elif api_version is not None and api_version == "infra.k8smgmt.io/v3":
-        return "rafay"
+        return "rafay_eksabm_cluster"
     else:
         return None
 
@@ -903,7 +905,7 @@ def update_eksabm_cluster(rafay_controller_url, headers,cluster_name, project_id
         #print("Response Status Code:", resp.status_code)
         #print("Response JSON:", resp.json())
     else:
-        print(f"\nERROR: Cluster update failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}")
+        print(f"\nERROR:: Cluster update failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}")
         sys.exit(1)
 
     return resp
@@ -954,7 +956,7 @@ def monitor_eksabm_cluster_status_progress(rafay_controller_url, headers, condit
                     conditions_status_dict[cnd_type] = [cnd_status,cnd_reason]
                     # Exit if any cluster status condition has failed 
                     if cnd_status == 'Failure':
-                        print(f"\nERROR: Cluster {target_condition_type} failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}. Cluster status condition type:{cnd_type}, status:{cnd_status}, reason:{cnd_reason}")
+                        print(f"\nERROR:: Cluster {target_condition_type} failed. Exiting... cluster_name:{cluster_name}, project_id:{project_id}. Cluster status condition type:{cnd_type}, status:{cnd_status}, reason:{cnd_reason}")
                         print_cluster_condition_status_summary(conditions_type_list,conditions_status_dict)
                         sys.exit(1)
 
@@ -1125,7 +1127,7 @@ def process_input_yaml(input_yaml):
         #    print(f"    {key}: {value}")
 
     except Exception as e:
-        print(f"[-] Error processing input YAML file {input_yaml}: {e}")
+        print(f"[-] ERROR: Error processing input YAML file {input_yaml}: {e}")
         exit(1)
     
     return input_data
@@ -1171,8 +1173,8 @@ def run_local_command(command):
         print(process.stderr)
     return process.returncode
     
-def get_cp_vms_count(cluster_name):
-    get_cp_count_cmd=f'sudo ls {vm_dir}/{cluster_name} | grep {cluster_name}-cp-n | wc -l'
+def get_eksabm_cp_vms_count(cluster_name):
+    get_cp_count_cmd=f'sudo ls {eksa_vm_dir}/{cluster_name} | grep {cluster_name}-cp-n | wc -l'
     try:
         process = subprocess.run(get_cp_count_cmd, shell=True, capture_output=True, text=True)
         output = process.stdout
@@ -1181,16 +1183,16 @@ def get_cp_vms_count(cluster_name):
         cp_count_cluster = int(output)
         print(f'cp count {cp_count_cluster}')
     except subprocess.CalledProcessError as e:
-        print(f"encountered error while checking existing cp vms: {e}, ignoring and continuing with cp vms creation")
+        print(f"ERROR:: encountered error while checking existing cp vms: {e}, ignoring and continuing with cp vms creation")
         sys.exit(0)
     except ValueError as e:
-        print(f"encountered error while checking existing cp vms: {e}, ignoring and continuing with cp vms creation")
+        print(f"ERROR:: encountered error while checking existing cp vms: {e}, ignoring and continuing with cp vms creation")
         sys.exit(0)
     
     return cp_count_cluster
 
-def get_dp_vms_count(cluster_name):
-    get_dp_count_cmd=f'sudo ls {vm_dir}/{cluster_name} | grep {cluster_name}-dp-n | wc -l'
+def get_eksabm_dp_vms_count(cluster_name):
+    get_dp_count_cmd=f'sudo ls {eksa_vm_dir}/{cluster_name} | grep {cluster_name}-dp-n | wc -l'
     try:
         process = subprocess.run(get_dp_count_cmd, shell=True, capture_output=True, text=True)
         output = process.stdout
@@ -1199,118 +1201,326 @@ def get_dp_vms_count(cluster_name):
         dp_count_cluster = int(output)
         print(f'dp count {dp_count_cluster}')
     except subprocess.CalledProcessError as e:
-        print(f"encountered error while checking existing dp vms: {e}, ignoring and continuing with dp vms creation")
+        print(f"ERROR:: encountered error while checking existing dp vms: {e}, ignoring and continuing with dp vms creation")
         sys.exit(0)
     except ValueError as e:
-        print(f"encountered error while checking existing dp vms: {e}, ignoring and continuing with dp vms creation")
+        print(f"ERROR:: encountered error while checking existing dp vms: {e}, ignoring and continuing with dp vms creation")
         sys.exit(0)
     
     return dp_count_cluster
 
-def validate_vms_presence(cp_count, dp_count, cluster_name):
-    cp_count_cluster = get_cp_vms_count(cluster_name)
-    dp_count_cluster = get_dp_vms_count(cluster_name)
+def validate_eksabm_vms_presence(cp_count, dp_count, cluster_name):
+    cp_count_cluster = get_eksabm_cp_vms_count(cluster_name)
+    dp_count_cluster = get_eksabm_dp_vms_count(cluster_name)
 
     if cp_count_cluster == cp_count and dp_count_cluster == dp_count:
         return True
     
     return False
 
-def vbox_vms_dependencies(cp_count, dp_count, cluster_name): 
+
+def validate_vms_presence(vm_count, vm_name_prefix):
+
+    get_vm_count_cmd=f'sudo ls {vm_dir} | grep {vm_name_prefix} | wc -l'
+    try:
+        process = subprocess.run(get_vm_count_cmd, shell=True, capture_output=True, text=True)
+        output = process.stdout
+        if process.returncode != 0:
+            print(f'encountered error while checking existing vms: {process.stderr}, ignoring and continuing with vm creation')
+        vm_present_count = int(output)
+        print(f'vm count {vm_count}')
+    except subprocess.CalledProcessError as e:
+        print(f"ERROR encountered error while checking existing vms: {e}, ignoring and continuing with vm creation")
+
+    except ValueError as e:
+        print(f"ERROR encountered error while checking existing vms: {e}, ignoring and continuing with vm creation")
+ 
+    print(f'[+] Checking if vm {vm_name_prefix} has been launched {vm_count} times already. Detected it has been launched {vm_present_count} times already')
+    
+    if vm_present_count == vm_count:
+        return True
+    
+    return False
+
+
+def eksabm_vbox_vms_dependencies(cp_count, dp_count, cluster_name): 
     print(f"\n[+] Installing vbox. This step may take a while, please be patient.....")
     vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/install-vbox-vagrant.sh > {staging_dir}/install-vbox-vagrant.log 2>&1; cat {staging_dir}/install-vbox-vagrant.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
-    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/install-vbox-vagrant.sh > {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo bash {staging_dir}/vm-scripts/create-network.sh  >> {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo bash {staging_dir}/vm-scripts/launch-admin-vm.sh  >> {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo bash {staging_dir}/vm-scripts/launch-cluster-vms.sh -n {cluster_name} -c {cp_count} -d {dp_count}  >> {staging_dir}/vm_launch_{cluster_name}.log 2>&1; sudo chmod -R 744 /root/eksa/"
     print(f"\n[+] Creating vbox network. This step may take a while, please be patient....")
-    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/create-network.sh > {staging_dir}/create-network.log 2>&1; cat {staging_dir}/create-network.log"
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/create-eksabm-network.sh > {staging_dir}/create-eksabm-network.log 2>&1; cat {staging_dir}/create-eksabm-network.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
-def create_admin_vm():
+def create_eksabm_admin_vm():
     print(f"\n[+] Creating eksa admin vm. This step may take a while, please be patient...")
-    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-admin-vm.sh > {staging_dir}/launch-admin-vm.log 2>&1; cat {staging_dir}/launch-admin-vm.log"
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-eksabm-admin-vm.sh > {staging_dir}/launch-eksabm-admin-vm.log 2>&1; cat {staging_dir}/launch-eksabm-admin-vm.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
-def create_cp_dp_vms(cp_count, dp_count, cluster_name):
+def create_eksabm_cp_dp_vms(cp_count, dp_count, cluster_name):
     print(f"\n[+] Creating control plane vms. This step may take a while, please be patient...")
-    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-cluster-vms.sh -n {cluster_name} -c {cp_count} -d 0 > {staging_dir}/launch-cluster-vms-cp.log 2>&1; cat {staging_dir}/launch-cluster-vms-cp.log"
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-eksabm-cluster-vms.sh -n {cluster_name} -c {cp_count} -d 0 > {staging_dir}/launch-eksabm-cluster-vms-cp.log 2>&1; cat {staging_dir}/launch-eksabm-cluster-vms-cp.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
     print(f"\n[+] Creating data plane vms. This step may take a while, please be patient...")
-    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-cluster-vms.sh -n {cluster_name} -c 0 -d {dp_count} > {staging_dir}/launch-cluster-vms-dp.log 2>&1; cat {staging_dir}/launch-cluster-vms-dp.log"
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-eksabm-cluster-vms.sh -n {cluster_name} -c 0 -d {dp_count} > {staging_dir}/launch-eksabm-cluster-vms-dp.log 2>&1; cat {staging_dir}/launch-eksabm-cluster-vms-dp.log"
     ret_code = run_local_command(vms_launch_cmd)
     if ret_code != 0:
-        print(f"\nERROR: Command exited with error {vms_launch_cmd}..Exiting...")
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
         sys.exit(1)
 
-# launch vbox vms 
-def launch_vbox_vms(cluster_provision_ctx):
-    cluster_name = cluster_provision_ctx["cluster_name"]
+# launch vbox vms for eksabm clusters
+def launch_eksabm_vbox_vms(input_data):
     
-    cp_count = cluster_provision_ctx["cp_count"]
-    dp_count = cluster_provision_ctx["dp_count"]
+    #infrastructure_provider = input_data["infrastructure_provider"]
+    #infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
+    provisioner = input_data["provisioner"]
+    provisioner_config = input_data["provisioner_config"][provisioner]
+
+    cluster_name = provisioner_config["cluster_name"]
+    cp_count = provisioner_config["num_control_plane_nodes"]
+    dp_count = provisioner_config["num_worker_nodes"]
 
     if cp_count <= 0 or dp_count <= 0:
-        print(f"\nERROR: CP and DP VMs count cannot be 0 or negative")
+        print(f"\nERROR:: CP and DP VMs count cannot be 0 or negative")
         sys.exit(1)
 
-    operation_type = cluster_provision_ctx["operation_type"]
+    operation_type = provisioner_config["operation_type"]
     
-    already_vms_created = validate_vms_presence(cp_count, dp_count, cluster_name)
+    already_vms_created = validate_eksabm_vms_presence(cp_count, dp_count, cluster_name)
     if already_vms_created:
         print(f"vms already created, skipping")
         return
 
     if operation_type == "provision":
-        vbox_vms_dependencies(cp_count, dp_count, cluster_name)
-        create_admin_vm()
+        eksabm_vbox_vms_dependencies(cp_count, dp_count, cluster_name)
+        create_eksabm_admin_vm()
         computed_cp_count=cp_count
         computed_dp_count=dp_count
     elif operation_type == "upgrade":
-        current_cp_count=get_cp_vms_count(cluster_name)
-        current_dp_count=get_dp_vms_count(cluster_name)
+        current_cp_count=get_eksabm_cp_vms_count(cluster_name)
+        current_dp_count=get_eksabm_dp_vms_count(cluster_name)
         computed_cp_count=cp_count-current_cp_count
         computed_dp_count=dp_count-current_dp_count
         if computed_cp_count <= 0 or computed_dp_count <= 0:
-            print(f"\nERROR: CP / DP VMs count are invalid")
+            print(f"\nERROR:: CP / DP VMs count are invalid")
             sys.exit(1)
 
-    create_cp_dp_vms(cp_count, dp_count, cluster_name)
+    create_eksabm_cp_dp_vms(cp_count, dp_count, cluster_name)
+
+
+def vbox_vms_dependencies(): 
+    print(f"\n[+] Installing vbox. This step may take a while, please be patient.....")
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/install-vbox-vagrant.sh > {staging_dir}/install-vbox-vagrant.log 2>&1; cat {staging_dir}/install-vbox-vagrant.log"
+    ret_code = run_local_command(vms_launch_cmd)
+    if ret_code != 0:
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
+        sys.exit(1)
+
+    print(f"\n[+] Creating vm vbox network. This step may take a while, please be patient....")
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/create-vm-network.sh > {staging_dir}/create-vm-network.log 2>&1; cat {staging_dir}/create-vm-network.log"
+    ret_code = run_local_command(vms_launch_cmd)
+    if ret_code != 0:
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
+        sys.exit(1)
+
+def create_vms(vm_name, vm_count, vm_cpu, vm_mem, vm_os_family, vm_vagrant_box):
+    print(f"\n[+] Creating {vm_count} vms of name {vm_name}. This step may take a while, please be patient...")
+    vms_launch_cmd=f"sudo bash {staging_dir}/vm-scripts/launch-vms.sh -n {vm_name} -c {vm_count} -p {vm_cpu} -m {vm_mem} -o {vm_os_family} -i {vm_vagrant_box}  > {staging_dir}/launch-vms.log 2>&1; cat {staging_dir}/launch-vms.log"
+    ret_code = run_local_command(vms_launch_cmd)
+    if ret_code != 0:
+        print(f"\nERROR:: Command exited with error {vms_launch_cmd}..Exiting...")
+        sys.exit(1)
+
+
+def get_vms_ips():
+    global_allocation_table=f"{vm_dir}/global_allocation_table"
+    get_vms_ips_cmd=f'sudo cat {global_allocation_table}'
+    try:
+        process = subprocess.run(get_vms_ips_cmd, shell=True, capture_output=True, text=True)
+        output = process.stdout
+        if process.returncode != 0:
+            print(f'ERROR:: encountered error while checking vms ips: {process.stderr}')
+        
+        output_lines = output.strip().split('\n')
+        vms_map = {}
+        
+        for line in output_lines:
+            fields = line.split(',')
+            key = fields[0]
+            values = fields[1:]
     
+            value_map = {
+                'MAC': values[0],
+                'IP': values[1],
+                'Port': values[2]
+            }
+
+            # Update vms_map with key as vm_name and value as value_map containing MAC, IP and Port
+            vms_map[key] = value_map
+
+        print(f"\n[+] Processed global allocation table {global_allocation_table} and detected below vms:")
+        for key, values in vms_map.items():
+            print(f"vm_name: {key}, vm_details: {values}")
+
+    except subprocess.CalledProcessError as e:
+        print(f"ERROR:: encountered error while checking vms ips: {e}")
+        sys.exit(1)
+    except ValueError as e:
+        print(f"ERROR:: encountered error while checking vms ips: {e}")
+        sys.exit(1)
+    
+    return vms_map
+
+
+# launch vbox vms for vms_only
+def launch_vbox_vms(input_data):
+   
+    vm_name=vm_os_family=vm_vagrant_box=""
+    vm_count=vm_cpu=vm_mem=0
+
+    infrastructure_provider = input_data["infrastructure_provider"]
+    infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
+    ssh_public_key = infrastructure_provider_data["ssh_public_key"]
+
+    provisioner = input_data["provisioner"]
+    provisioner_config = input_data["provisioner_config"][provisioner]
+
+    # Default values
+    default_values = {
+        'count': 1,
+        'cpu': 2,
+        'mem': 16384,
+        'osfamily': 'ubuntu',
+        'vagrant_box': 'bento/ubuntu-20.04'
+    }
+    
+    vbox_vms_dependencies()
+
+    # loop over provisioner_config array and launch vms
+    for vm in provisioner_config:
+            vm_name = vm.get('name')
+            vm_count = vm.get('count', default_values['count'])
+            vm_cpu = vm.get('cpu', default_values['cpu'])
+            vm_mem = vm.get('mem', default_values['mem'])
+            vm_os_family = vm.get('osfamily', default_values['osfamily'])
+            vm_vagrant_box = vm.get('vagrant_image', default_values['vagrant_box'])
+
+            if vm_name is None:
+                print(f"\nERROR:: vm name cannot be empty")
+                sys.exit(1)
+
+            if vm_count <= 0:
+                print(f"\nERROR:: vm count cannot be 0 or negative")
+                sys.exit(1)
+
+            if vm_cpu <= 0:
+                print(f"\nERROR:: vm cpu cannot be 0 or negative")
+                sys.exit(1)
+
+            if vm_mem <= 0:
+                print(f"\nERROR:: vm memory cannot be 0 or negative")
+                sys.exit(1)
+
+            print(f"\n[+] Detected vm config:: vm_name: {vm_name}, vm_count:{vm_count}, vm_cpu:{vm_cpu}, vm_mem:{vm_mem}, vm_os_family:{vm_os_family}, vm_vagrant_box:{vm_vagrant_box}")
+
+    
+            already_vms_created = validate_vms_presence(vm_count, vm_name)
+            if already_vms_created:
+                print(f"vms already created, skipping")
+                continue
+
+            create_vms(vm_name, vm_count, vm_cpu, vm_mem, vm_os_family, vm_vagrant_box)
+
+    # After vm creation, collect IP details from Global Allocation Table    
+    vms_ip_details = get_vms_ips()
+    vm_username='vagrant'
+    vm_password='vagrant'
+    
+    # loop over vms_ip_details array and populate authorized_keys file for ssh access
+    for vm in vms_ip_details.keys():
+            vm_ipaddr = vms_ip_details[vm]['IP']
+            vm_macaddr = vms_ip_details[vm]['MAC']
+            vm_local_forwarded_port = vms_ip_details[vm]['Port']
+
+            print(f"\n[+] vms created:: vm_name: {vm}, vm_ip:{vm_ipaddr}, vm_mac:{vm_macaddr}, vm_local_forwarded_port:{vm_local_forwarded_port}")
+
+            # Create ssh config entry for vms node on local machine
+            ssh_config_entry=f"\n\nHost {vm}\n  HostName 127.0.0.1\n  User vagrant\n  Port {vm_local_forwarded_port}\n  IdentityFile {staging_dir}/ssh_private_key_file\n  StrictHostKeyChecking no\n  UserKnownHostsFile=/dev/null\n"
+            with open("/home/ubuntu/.ssh/config", "a") as ssh_config_file:
+                    ssh_config_file.write(ssh_config_entry)
+
+            print(f"\n[+] Waiting 1 minute to allow vm {vm} to boot up")
+            import time
+            time.sleep(60*2) 
+                        
+            # Copy ssh_public key to authorized keys of vm
+            print(f"\n[+] Copying ssh_public key to authorized keys of vm {vm}")
+
+            full_command = f"echo {ssh_public_key} > /home/vagrant/.ssh/authorized_keys; echo {ssh_public_key} >> /home/vagrant/ssh_public_key; chmod 600 /home/vagrant/ssh_private_key_file"
+            stdout,err = execute_remote_command('127.0.0.1', vm_local_forwarded_port, vm_username, vm_password, full_command)
+
+
+    print(f"\n[+] vms launched. To ssh to vms, run 'ssh <vm_name>' from cloud instance\n\n")
+
 # using rafay provisioner
-def rafay_provisioner(cluster_provision_ctx):
-    cluster_name = cluster_provision_ctx["cluster_name"]
-    k8s_version = cluster_provision_ctx["k8s_version"]
-    cp_count = cluster_provision_ctx["cp_count"]
-    dp_count = cluster_provision_ctx["dp_count"]
-    ssh_public_key = cluster_provision_ctx["ssh_public_key"]
+def eksabm_rafay_provisioner(input_data):
+    
+    # collect necessary data from config/input file
+    infrastructure_provider = input_data["infrastructure_provider"]
+    infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
+    provisioner = input_data["provisioner"]
+    provisioner_config = input_data["provisioner_config"][provisioner]
 
     try:
-        cluster_yaml = cluster_provision_ctx["cluster_yaml"]
+        cluster_yaml_filename = provisioner_config["config_file_name"]
     except KeyError:
+        cluster_yaml_filename = None 
+
+    if cluster_yaml_filename is None:
+        cluster_name = provisioner_config["cluster_name"]
+        k8s_version = provisioner_config["k8s_version"]
+        cp_count = provisioner_config["num_control_plane_nodes"]
+        dp_count = provisioner_config["num_worker_nodes"]
         cluster_yaml = None 
 
+    else:
+        cluster_name = provisioner_config["cluster_name"]
+        cluster_yaml_file=f'{staging_dir}/cluster_configs/{cluster_yaml_filename}'
+        provisioner_by_yaml_file=get_provisioner_by_yaml_file(cluster_yaml_file)
+
+        if provisioner_by_yaml_file is None or provisioner_by_yaml_file != provisioner:
+            print(f'\nERROR:: cluster file of cluster {cluster_name} does not match with yaml file format of {provisioner}, exiting !!')
+            sys.exit(1)
+
+        if os.path.exists(cluster_yaml_file):
+                k8s_version,cp_count,dp_count,cluster_yaml = extract_cluster_details_from_cluster_yaml(cluster_yaml_file,provisioner)
+        else:
+            print(f"\nERROR:: cluster file {cluster_yaml_file} does not exist for cluster {cluster_name}")
+            sys.exit(1)
+
+ 
     print(f"\n[+] Detected desired cluster spec for provision::  cluster_name: {cluster_name}, k8s_version:{k8s_version}, cp_count:{cp_count}, dp_count:{dp_count}")
     
-    rafay_controller_url = cluster_provision_ctx["rafay_controller_url"]
-    rafay_api_key_file = cluster_provision_ctx["rafay_api_key_file"]
-    rafay_project_name = cluster_provision_ctx["rafay_project_name"]
-    gw_name = cluster_provision_ctx["gw_name"]
-    ssh_public_key = cluster_provision_ctx["ssh_public_key"]
+    rafay_controller_url = provisioner_config["rafay_controller_url"]
+    rafay_api_key_file = provisioner_config["rafay_api_key_file"]
+    rafay_project_name = provisioner_config["rafay_project_name"]
+    gw_name = provisioner_config["gw_name"]
+    ssh_public_key = infrastructure_provider_data["ssh_public_key"]
 
-    print(f"\n[+] Detected cluster provisioner config:: cluster_provisioner: rafay, rafay_controller_url: {rafay_controller_url}, rafay_api_key_file:{rafay_api_key_file}, rafay_project_name:{rafay_project_name}, gw_name:{gw_name}")
+    print(f"\n[+] Detected cluster provisioner config:: cluster_provisioner: rafay_eksabm_cluster, rafay_controller_url: {rafay_controller_url}, rafay_api_key_file:{rafay_api_key_file}, rafay_project_name:{rafay_project_name}, gw_name:{gw_name}")
 
 
     # read rafay_api_key from file rafay_api_key_file
@@ -1328,9 +1538,9 @@ def rafay_provisioner(cluster_provision_ctx):
     gw_description = gw_name
     gw_type = 'eksaBareMetal'
     
-    hardware_csv_location=f"{vm_dir}/{cluster_name}/generated_hardware.csv"
-    cluster_tinkerbell_ip_file=f"{vm_dir}/{cluster_name}/tinkerbell_ip"
-    cluster_endpoint_ip_file=f"{vm_dir}/{cluster_name}/endpoint_ip"   
+    hardware_csv_location=f"{eksa_vm_dir}/{cluster_name}/generated_hardware.csv"
+    cluster_tinkerbell_ip_file=f"{eksa_vm_dir}/{cluster_name}/tinkerbell_ip"
+    cluster_endpoint_ip_file=f"{eksa_vm_dir}/{cluster_name}/endpoint_ip"   
     project_id = get_project_id(rafay_controller_url, rafay_project_name, headers, seq=1)
     
     # Copy the ssh_private_key_file file to the instance
@@ -1403,39 +1613,65 @@ def rafay_provisioner(cluster_provision_ctx):
     # Step 13. Monitor cluster provision progress by checking cluster status condition ClusterHealthy is in status Success
     monitor_eksabm_cluster_status_progress(rafay_controller_url, headers, conditions_type_list, "ClusterHealthy", "Success", cluster_name, project_id, 13)
 
+
 def eksctl_create_cluster(cluster_dir, cluster_name, eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, seq):
     eksctl_cluster_create_cmd=f"pushd {cluster_dir}; eksctl anywhere create cluster --hardware-csv hardware.csv -f {cluster_name}.yaml 2>&1 | tee -a {cluster_dir}/eksa-create-cluster.log; popd"
     print(f"\n[{seq}.] Creating cluster : {eksctl_cluster_create_cmd}")
     full_command = f"sudo su -c '{eksctl_cluster_create_cmd}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to create cluster failed. err: {err}")
+        print(f"\nERROR:: Execution of command to create cluster failed. err: {err}")
         sys.exit(1)
     else:
         print(f"Execution of command to create cluster passed. stdout:\n {stdout}")
 
-# using native provisioner
-def native_provisioner(cluster_provision_ctx):
 
+# using native provisioner
+def eksabm_native_provisioner(input_data):
+    
     # collect necessary data from config/input file
-    cluster_name = cluster_provision_ctx["cluster_name"]
-    k8s_version = cluster_provision_ctx["k8s_version"]
-    cp_count = cluster_provision_ctx["cp_count"]
-    dp_count = cluster_provision_ctx["dp_count"]
-    ssh_public_key = cluster_provision_ctx["ssh_public_key"]
+    infrastructure_provider = input_data["infrastructure_provider"]
+    infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
+    provisioner = input_data["provisioner"]
+    provisioner_config = input_data["provisioner_config"][provisioner]
 
     try:
-        cluster_yaml = cluster_provision_ctx["cluster_yaml"]
+        cluster_yaml_filename = provisioner_config["config_file_name"]
     except KeyError:
-        cluster_yaml = None  
+        cluster_yaml_filename = None 
+
+    if cluster_yaml_filename is None:
+        cluster_name = provisioner_config["cluster_name"]
+        k8s_version = provisioner_config["k8s_version"]
+        cp_count = provisioner_config["num_control_plane_nodes"]
+        dp_count = provisioner_config["num_worker_nodes"]
+        cluster_yaml = None 
+
+    else:
+        cluster_name = provisioner_config["cluster_name"]
+        cluster_yaml_file=f'{staging_dir}/cluster_configs/{cluster_yaml_filename}'
+        provisioner_by_yaml_file=get_provisioner_by_yaml_file(cluster_yaml_file)
+
+        if provisioner_by_yaml_file is None or provisioner_by_yaml_file != provisioner:
+            print(f'\nERROR:: cluster file of cluster {cluster_name} does not match with yaml file format of {provisioner}, exiting !!')
+            sys.exit(1)
+
+        if os.path.exists(cluster_yaml_file):
+                k8s_version,cp_count,dp_count,cluster_yaml = extract_cluster_details_from_cluster_yaml(cluster_yaml_file,provisioner)
+        else:
+            print(f"\nERROR:: cluster file {cluster_yaml_file} does not exist for cluster {cluster_name}")
+            sys.exit(1)
+
+
+    ssh_public_key = infrastructure_provider_data["ssh_public_key"]
     
     eksa_admin_ip = "127.0.0.1"
     eksa_admin_port = 5022  # eksa_admin node ssh port 
     eksa_admin_username = "vagrant"
     eksa_admin_password = "vagrant"
-    hardware_csv_location=f"{vm_dir}/{cluster_name}/generated_hardware.csv"
-    cluster_tinkerbell_ip_file=f"{vm_dir}/{cluster_name}/tinkerbell_ip"
-    cluster_endpoint_ip_file=f"{vm_dir}/{cluster_name}/endpoint_ip"   
+    hardware_csv_location=f"{eksa_vm_dir}/{cluster_name}/generated_hardware.csv"
+    cluster_tinkerbell_ip_file=f"{eksa_vm_dir}/{cluster_name}/tinkerbell_ip"
+    cluster_endpoint_ip_file=f"{eksa_vm_dir}/{cluster_name}/endpoint_ip"   
 
     cluster_dir=f"{staging_dir}/native/{cluster_name}"
     remote_hardware_csv_location=f"{cluster_dir}/hardware.csv"
@@ -1473,7 +1709,7 @@ def native_provisioner(cluster_provision_ctx):
     full_command = f"sudo su -c '{create_dir_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to create cluster directory failed. err: {err}")
+        print(f"\nERROR:: Execution of command to create cluster directory failed. err: {err}")
         sys.exit(1)
 
 
@@ -1485,7 +1721,7 @@ def native_provisioner(cluster_provision_ctx):
     full_command = f"sudo su -c '{echo_hardware_csv_content_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to create hardware csv failed. err: {err}")
+        print(f"\nERROR:: Execution of command to create hardware csv failed. err: {err}")
         sys.exit(1)
     
     # Step 3. create cluster config file
@@ -1511,7 +1747,7 @@ def native_provisioner(cluster_provision_ctx):
     full_command = f"sudo su -c '{install_eksctl_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to install eksctl cli failed. err: {err}")
+        print(f"\nERROR:: Execution of command to install eksctl cli failed. err: {err}")
         sys.exit(1)
 
     # Step 5. install yq
@@ -1520,7 +1756,7 @@ def native_provisioner(cluster_provision_ctx):
     full_command = f"sudo su -c '{install_yq_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err and 'https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64' not in err:
-        print(f"\nERROR: Execution of command to install yq cli failed. err: {err}")
+        print(f"\nERROR:: Execution of command to install yq cli failed. err: {err}")
         sys.exit(1)
     
     # Step 6. install eksctl anywhere
@@ -1529,7 +1765,7 @@ def native_provisioner(cluster_provision_ctx):
     full_command = f"sudo su -c '{install_eksctl_anywhere_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err:
-        print(f"\nERROR: Execution of command to install eksctl anywhere plugin failed. err: {err}")
+        print(f"\nERROR:: Execution of command to install eksctl anywhere plugin failed. err: {err}")
         sys.exit(1)
 
 
@@ -1539,7 +1775,7 @@ def native_provisioner(cluster_provision_ctx):
     full_command = f"sudo su -c '{install_kubectl_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     if err and '% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current' not in err:
-        print(f"\nERROR: Execution of command to install kubectl cli failed. err: {err}")
+        print(f"\nERROR:: Execution of command to install kubectl cli failed. err: {err}")
         sys.exit(1)
 
 
@@ -1549,7 +1785,7 @@ def native_provisioner(cluster_provision_ctx):
     full_command = f"sudo su -c '{install_docker_command}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
     # if err:
-    #     print(f"\nERROR: Execution of command to install docker failed. err: {err}")
+    #     print(f"\nERROR:: Execution of command to install docker failed. err: {err}")
     #     # sys.exit(1)
     # else:
     #     print(f"\nExecution of command to install docker passed. stdout: {stdout}")
@@ -1567,7 +1803,7 @@ def native_provisioner(cluster_provision_ctx):
         full_command = f"sudo su -c '{fetch_cluster_creation_logs_command}'"
         stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
         if err and 'No such file or directory' not in err:
-            print(f"\nERROR: Execution of command to fetch cluster creation logs failed. err: {err}")
+            print(f"\nERROR:: Execution of command to fetch cluster creation logs failed. err: {err}")
             sys.exit(1)
         else:
             print(f"   [+] Execution of command to fetch cluster creation logs passed. stdout:\n {stdout}")
@@ -1621,7 +1857,7 @@ def native_provisioner(cluster_provision_ctx):
         full_command = f"sudo su -c '{fetch_cluster_creation_logs_command}'"
         stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)
         if err and 'No such file or directory' not in err:
-            print(f"\nERROR: Execution of command to fetch cluster creation logs failed. err: {err}")
+            print(f"\nERROR:: Execution of command to fetch cluster creation logs failed. err: {err}")
             sys.exit(1)
         else:
             print(f"   [+] Execution of command to fetch cluster creation logs passed. stdout: {stdout}")
@@ -1633,17 +1869,17 @@ def native_provisioner(cluster_provision_ctx):
     return
 
 # provision cluster
-def provision_cluster(cluster_provision_ctx):  
+def provision_cluster(input_data):  
+    # collect necessary data from input file
+    provisioner = input_data["provisioner"]
     
-    if cluster_provision_ctx["cluster_provisioner"] == "rafay":   
-        rafay_provisioner(cluster_provision_ctx)
-    elif cluster_provision_ctx["cluster_provisioner"] == "native":
-        native_provisioner(cluster_provision_ctx)
-    elif cluster_provision_ctx["cluster_provisioner"] == "none":
-        print(f"\n[+] Detected none cluster provisioner...skipping cluster provision")
-    else:
-        print(f"\n[+] Detected Unsupported cluster provisioner...skipping cluster provision: {cluster_provision_ctx['cluster_provisioner']}")
+    if provisioner == "rafay_eksabm_cluster":   
+        eksabm_rafay_provisioner(input_data)
+    elif provisioner == "eksabm_cluster":
+        eksabm_native_provisioner(input_data)
 
+
+'''
 def upgrade_eksabm_cluster(rafay_controller_url, headers,cluster_name, project_id, k8s_version, seq=1):
     url = rafay_controller_url+'/v2/infra/project/'+project_id+'/cluster/'+cluster_name+'/upgrade'
     method = 'POST'
@@ -1896,6 +2132,7 @@ def upgrade_cluster(cluster_provision_ctx):
         print(f"upgrade using native provisioner")
     else:
         print(f"\n[+] Detected Unsupported cluster provisioner...skipping cluster provision: {cluster_provision_ctx['cluster_provisioner']}")
+'''
 
 if __name__ == "__main__":
 
@@ -1907,65 +2144,33 @@ if __name__ == "__main__":
         print(f"[-] Error processing input YAML file {input_yaml}")
         exit(1)
 
-    # Cluster provision context dictionary
-    cluster_provision_ctx = {}
-    
-    cluster_provisioner = input_data["cluster_provisioner"]
-    print(f"\n[+] Detected cluster provisioner: {cluster_provisioner}")
-    cluster_provisioner_data = input_data["cluster_provisioner_config"][cluster_provisioner]
+    # Extract provisioner from input.yaml 
+    provisioner = input_data["provisioner"]
+    print(f"\n[+] Detected provisioner: {provisioner}")
+    provisioner_config = input_data["provisioner_config"][provisioner]
 
-    cluster_provision_ctx["cluster_provisioner"] = cluster_provisioner
+    # Process "rafay_eksabm_cluster" or "eksabm_cluster" provisioner
+    if provisioner == "rafay_eksabm_cluster" or provisioner == "eksabm_cluster":
+        # Launch virtual infrastructure using vagrant and Virtualbox 
+        launch_eksabm_vbox_vms(input_data)
 
-
-    infrastructure_provider = input_data["infrastructure_provider"]
-    infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
-    cluster_provision_ctx["ssh_public_key"] = infrastructure_provider_data["ssh_public_key"]
-                          
-    # Extract cluster provisioner specific data
-    if cluster_provisioner == "rafay":
-        cluster_provision_ctx["rafay_controller_url"] = cluster_provisioner_data["rafay_controller_url"]
-        cluster_provision_ctx["rafay_api_key_file"] = cluster_provisioner_data["rafay_api_key_file"]
-        cluster_provision_ctx["rafay_project_name"] = cluster_provisioner_data["rafay_project_name"]
-        cluster_provision_ctx["gw_name"] = cluster_provisioner_data["rafay_eksabm_gateway_name"]
-
-    # Extract clusters from input and provision
-    clusters = input_data["clusters"]
-    for cluster in clusters:
-        operation_type = cluster["operation_type"]
+        operation_type = provisioner_config["operation_type"]
         if operation_type not in valid_operations:
             print(f"\n[INFO] Invalid operation type: {operation_type}")
-            continue
 
-        if 'config_file_name' not in cluster:
-            # continue # for testing purpose, remove this
-            cluster_provision_ctx["cluster_name"] = cluster["cluster_name"]
-            cluster_provision_ctx["k8s_version"] = cluster["k8s_version"]
-            cluster_provision_ctx["cp_count"] = cluster["num_control_plane_nodes"]
-            cluster_provision_ctx["dp_count"] = cluster["num_worker_nodes"]
-            cluster_provision_ctx["operation_type"] = operation_type
-        else:
-            cluster_provision_ctx["operation_type"] = operation_type
-            cluster_provision_ctx["cluster_name"] = cluster["cluster_name"]
-            cluster_yaml_file=f'{staging_dir}/cluster_configs/{cluster["config_file_name"]}'
-            provisioner_by_yaml_file=get_provisioner_by_yaml_file(cluster_yaml_file)
-
-            if provisioner_by_yaml_file is None or provisioner_by_yaml_file != cluster_provisioner:
-                print(f'cluster file of cluster {cluster["cluster_name"]} does not match with yaml file format of {cluster_provisioner}, skipping !!')
-                continue
-            if os.path.exists(cluster_yaml_file):
-                kubernetes_version,cp_count,dp_count,cluster_yaml=extract_cluster_details_from_cluster_yaml(cluster_yaml_file,cluster_provisioner)
-                cluster_provision_ctx["k8s_version"] = kubernetes_version
-                cluster_provision_ctx["cp_count"] = cp_count
-                cluster_provision_ctx["dp_count"] = dp_count
-                cluster_provision_ctx["cluster_yaml"] = cluster_yaml
-            else:
-                print(f"\n cluster file {cluster_yaml_file} does not exist for cluster {cluster['cluster_name']}")
-                continue
-            
-
-        launch_vbox_vms(cluster_provision_ctx)
-
+        # Provision eksabm cluster
         if operation_type == "provision":
-            provision_cluster(cluster_provision_ctx)
+            provision_cluster(input_data)
         # elif operation_type == "upgrade": # upgrade is untested
-        #     upgrade_cluster(cluster_provision_ctx)
+            #upgrade_cluster(cluster_provision_ctx)
+    
+    elif provisioner == "vms_only":
+        # Launch virtual infrastructure using vagrant and Virtualbox for vms_only provisioner
+        launch_vbox_vms(input_data)
+    
+    elif provisioner == "none":
+        # Process "vms_only" provisioner
+        print(f"\n[+] Detected none provisioner. :EXITING:")
+    
+    else:
+        print(f"\n[+] Detected Unsupported provisioner: {provisioner} :EXITING:")

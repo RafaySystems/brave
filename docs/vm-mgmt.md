@@ -223,7 +223,7 @@ bash /opt/rafay/vm-scripts/resurrect-vms.sh
 
 Few other utility scripts are listed below (although these should rarely get used in normal circumstances) :
 
-- `create-network.sh`: Shell script utility to create the NAT Network for deploying vms on. You should not normally have to use this script by itself.
+- `create-eksabm-network.sh`: Shell script utility to create the NAT Network for deploying vms on. You should not normally have to use this script by itself.
 
 - `delete-network.sh`: Shell script utility to delete the NAT Network. You should not normally have to use this script by itself.  
 

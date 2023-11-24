@@ -32,16 +32,16 @@ Cost and complexity of bare metal deployments can be prohibitive for a number of
 
 - Providing multiple provisioners that execute tailored workflows specifically designed for utilizing bare metal infrastructure in various use cases.
 
-`brave` currently supports these automated workflows via its provisioners:
+`brave` facilitates a spectrum of automated workflows through its provisioners:
 
-1. **Launching VMs**: Deployment of mutiple virtual machines with configurable capacity and OS flavours on a single layer 2 network. These virtual machines are allocated static IPs and have autobound access to the Internet. This setup can be used to implement any generic deployment requiring a number of bare metal servers interconnected over a layer 2 network along with Internet access. `brave` also programs ssh access to vms from the cloud instance housing them. This functionality is supported by `vms_only` provisioner.  
+1. **VM Deployment**: Enables deployment of mutiple virtual machines with configurable capacity and OS flavours on a single layer 2 network. These virtual machines are allocated static IPs and have outbound access to the Internet. This setup serves as a versatile deployment solution for interconnected bare metal servers. `brave` also configures SSH access to these VMs from the hosting cloud instance. This capability is supported by the `vms_only` provisioner.
 
-2. **EKSA Bare Metal Cluster Creation**: 
+2. **EKS Anywhere Bare Metal Cluster Creation**: Facilitates the creation of an EKS Anywhere Bare Metal (EKSA-BM) Kubernetes cluster.  Virtualbox-managed VMs emulate an EKSA admin machine along with all cluster machines. Interconnectivity among these EKSA machines is achieved through a Virtualbox NAT network, allowing cluster machines to PXE boot from the admin machine and install software from the Internet.  `brave` also implements a power management algorithm that monitors the state of the cluster and perform automatic power on and off of the Virtualbox vms without requiring BMC integration. This power management is mandatory for automated provisioning of an EKSA cluster. This functionality is supported by `eksabm_cluster` provisioner.  This provisioner uses **eksctl anywhere** cli for EKSA operations. 
 
 
-3. **EKSA Bare Metal Cluster Creation using Rafay Controller**: 
+3. **EKS Anywhere Bare Metal Cluster Creation using Rafay Controller**: This functionality is supported by `rafay_eksabm_cluster` provisioner.  This provisioner uses [Rafay Systems Inc.](https://docs.rafay.co/clusters/eksa_bm/overview/) Controller for EKSA operations. All other implementation details are same as `eksabm_cluster` provisioner explained above. 
 
-Extend by writing more porvisioners
+`brave` is written to be extensible and its functionality can be extended for new bare metal use cases by adding new provisioners. Each provisioner implements tailored workflow specifically designed for utilizing bare metal infrastructure in a particular use cases.
 
 ---
 

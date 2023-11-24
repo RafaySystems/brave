@@ -4,12 +4,20 @@
         - [Using AWS cloud as infrastructure provider](#using-aws-cloud-as-infrastructure-provider)
         - [Using OCI cloud as infrastructure provider](#using-oci-cloud-as-infrastructure-provider)
         - [Using pre existing cloud instance](#using-pre-existing-cloud-instance)
-    - [Cluster provisioner details](#2-cluster-provisioner-details)
-        - [Using `vms_only` provisioner](#using-native-provisioner)
-        - [Using `eksabm_cluster` provisioner](#using-native-provisioner)
-        - [Using `rafay_eksabm_cluster` provisioner](#using-rafay-provisioner)
+    - [Provisioner Details](#provisioner-details)
+        - [Using `vms_only` provisioner](#using-vms_only-provisioner)
+        - [Using `eksabm_cluster` provisioner](#using-eksabm_cluster-provisioner)
+        - [Using `rafay_eksabm_cluster` provisioner](#using-rafay_eksabm_cluster-provisioner)
         - [Using `none` provisioner](#using-none-provisioner)
-- [Example input.yaml files](#example-inputyaml-files)
+- [Example Configuration Files](#example-configuration-files)
+    - [Complete Example input yaml file ](#complete-example-input-yaml-file)
+    - [Example Launch VMs using OCI cloud](#example-launch-vms-using-oci-cloud)
+    - [Example Launch EKSA-BM Cluster using AWS cloud](#example-launch-eksa-bm-cluster-using-aws-cloud)
+    - [Example Launch EKSA-BM Cluster using Config File and OCI cloud](#example-launch-eksa-bm-cluster-using-config-file-and-oci-cloud)
+    - [Example Launch EKSA-BM Cluster on Rafay using AWS cloud](#example-launch-eksa-bm-cluster-on-rafay-using-aws-cloud)
+    - [Example Launch EKSA-BM Cluster on Rafay using Config File and OCI cloud](#example-launch-eksa-bm-cluster-on-rafay-using-config-file-and-oci-cloud)
+    - [Example Launch VMs using pre-existing instance](#example-launch-vms-using-pre-existing-instance)
+    - [Example Launch cloud instance ONLY on OCI](#example-launch-cloud-instance-only-on-oci)
 
 ---
 ## Populating input.yaml file  
@@ -115,7 +123,7 @@ Configuration items under `infrastructure_provider_config.infra_exists` key are:
 - cloud Instance must have enough capacity to hold all vms emulating the EKSA-BM hardware 
 
 
-### 2. Provisioner details
+### Provisioner Details
 
 Choose a provisioner (using key `provisioner` ) and fill out configuration for the chosen provisioner (using key `provisioner_config`).  Four provisioners are supported : `vms_only`, `eksabm_cluster`, `rafay_eksabm_cluster`, or `none`
 
@@ -225,9 +233,9 @@ provisioner_config:
 
 ---
 
-## Example configuration files 
+## Example Configuration Files 
 
-### Complete Example input.yaml file 
+### Complete Example input yaml file 
 
 ```sh
 # Infrastructure provider  !! CHANGE THIS TO YOUR INFRASTRUCTURE PROVIDER (aws, oci or infra_exists) 
@@ -329,7 +337,7 @@ provisioner_config:
 ```
 
 
-### Example : Launch VMs using OCI cloud
+### Example Launch VMs using OCI cloud
 
 ```sh
 
@@ -360,7 +368,7 @@ provisioner_config:
 
 ```
 
-### Example : Launch EKSA-BM Cluster using AWS cloud
+### Example Launch EKSA-BM Cluster using AWS cloud
 
 ```sh
 
@@ -385,7 +393,7 @@ provisioner_config:
 
 ```
 
-### Example : Launch EKSA-BM Cluster using Config File and OCI cloud
+### Example Launch EKSA-BM Cluster using Config File and OCI cloud
 
 ```sh
 
@@ -412,7 +420,7 @@ provisioner_config:
 
 ```
 
-### Example : Launch EKSA-BM Cluster on Rafay using AWS cloud
+### Example Launch EKSA-BM Cluster on Rafay using AWS cloud
 
 ```sh
 infrastructure_provider: aws  
@@ -440,7 +448,7 @@ provisioner_config:
 
 ```
 
-### Example : Launch EKSA-BM Cluster on Rafay using Config File and OCI cloud
+### Example Launch EKSA-BM Cluster on Rafay using Config File and OCI cloud
 
 ```sh
 
@@ -467,7 +475,7 @@ provisioner_config:
     
 ```
 
-### Example : Launch VMs using pre-existing instance
+### Example Launch VMs using pre-existing instance
 
 ```sh
 
@@ -499,7 +507,7 @@ provisioner_config:
 
 ```
 
-### Example : Launch cloud instance ONLY on OCI  
+### Example Launch cloud instance ONLY on OCI  
 
 ```sh
 # Infrastructure provider  !! CHANGE THIS TO YOUR INFRASTRUCTURE PROVIDER (aws, oci or infra_exists) 

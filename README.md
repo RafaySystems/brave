@@ -5,15 +5,19 @@
 
 - [Overview](#overview)
 - [Installation](#installation)
+    - [Clone Repo locally](#clone-repo-locally)
+    - [Install Terraform](#install-terraform)
+    - [Install Python3 and dependencies](#install-python3-and-dependencies)
 - [Usage](#usage)
-- [Supported Infrastructure Providers and Provisioners]
+- [Supported Infrastructure Providers and Provisioners](#supported-infrastructure-providers-and-provisioners)
 - [Supported Use Cases](#supported-use-cases)
-     - [Deploying VMs on a Cloud Instance]
-     - [EKSA Bare Metal Kubernetes Cluster Creation]
-         - [How `b.r.a.v.e` creates EKSA-BM Cluster](#how-brave-works)
-         - [Power Management Algorithm For EKSA-BM](#power-management-algorithm)
-         - [Accessing EKSA-BM Cluster](#accessing-cluster)
-         - [Advanced Usage, Debugging and VM Management](#vm-management-debugging-and-advanced-usage)         
+     - [Deploying VMs on a Cloud Instance](#deploying-vms-on-a-cloud-instance)
+         - [Accessing VMs and Debugging](#accessing-vms-and-debugging)
+     - [EKSA Bare Metal Kubernetes Cluster Creation using VMs](#eksa-bare-metal-kubernetes-cluster-creation-using-vms)
+         - [How `b.r.a.v.e` creates EKSA Bare Metal Kubernetes Cluster](#how-brave-creates-eksa-bare-metal-kubernetes-cluster)
+         - [Power Management Algorithm For EKSA-BM](#power-management-algorithm-for-eksa-bm)
+         - [Accessing EKSA-BM Cluster](#accessing-eksa-bm-cluster)
+         - [Advanced Usage, Debugging and VM Management](#advanced-usage-debugging-and-vm-management)         
 
 ---
 ## Overview
@@ -102,7 +106,7 @@ source venv/bin/activate
 ./launch.py
 ```
 
-**COMMENT**:: If you wish to follow along and look under the hood while `b.r.a.v.e` is doing its job, refer to [VM management, debugging and advanced usage section](#vm-management-debugging-and-advanced-usage)
+**Note**:: If you wish to follow along and look under the hood while `b.r.a.v.e` is doing its job, refer to [Advanced Usage, Debugging and VM Management](#advanced-usage-debugging-and-vm-management)
 
 
 4. Deleting existing setup as specified in input.yaml (also tears down the cloud instance depending on infrastructure provider selected)
@@ -240,7 +244,7 @@ Since entire infrastructure is contained within a single cloud instance, the ent
     -   `rafay_eksabm_cluster` which uses [Rafay Systems Inc.](https://docs.rafay.co/clusters/eksa_bm/overview/) Controller
     -   `eksabm_cluster` which uses **eksctl anywhere** cli directly 
 
-4. Automatically handling `power management of cluster machines WITHOUT a BMC controller by watching relevant cluster events` and performing power on and off of vms via VBoxManage cli. (See [below](#power-management-algorithm))
+4. Automatically handling `power management of cluster machines WITHOUT a BMC controller by watching relevant cluster events` and performing power on and off of vms via VBoxManage cli. (See [below](#power-management-algorithm-for-eksa-bm))
 
 **Note**: End to end creation of cluster (including time to create cloud instance) can range anywhere between 30 to 50 minutes. Please be patient. 
 

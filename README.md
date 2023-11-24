@@ -46,6 +46,8 @@ Cost and complexity of bare metal deployments can be prohibitive for a number of
 
 `b.r.a.v.e` is written to be extensible and its functionality can be extended for new bare metal use cases by adding new provisioners. Each provisioner implements tailored workflow specifically designed for utilizing bare metal infrastructure in a particular use cases.
 
+`b.r.a.v.e` is a [Rafay Systems Inc.](https://rafay.co/) project. For a comprehensive list of all open-source projects by Rafay, please refer to this [link](https://docs.rafay.co/oss/overview/).
+
 ---
 
 ## Installation

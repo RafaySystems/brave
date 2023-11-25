@@ -15,7 +15,7 @@
 
 ## VM management 
 
-**`brave`** emulates the entire bare metal infrastructure on a **single cloud** instance. It leverages [Virtualbox](https://www.virtualbox.org/) and [vagrant](https://www.vagrantup.com/) to `create VMs and a` [NAT Network](https://www.virtualbox.org/manual/ch06.html#network_nat_service). 
+**BRAVE** emulates the entire bare metal infrastructure on a **single cloud** instance. It leverages [Virtualbox](https://www.virtualbox.org/) and [vagrant](https://www.vagrantup.com/) to `create VMs and a` [NAT Network](https://www.virtualbox.org/manual/ch06.html#network_nat_service). 
 
 Virtualbox VMs are used to emulate bare metal servers, whereas VirtualBox's NAT Network is used to emulate the Layer2 Network these servers are connected to.  
 

@@ -22,7 +22,7 @@
 ---
 ## Populating input.yaml file  
 
-`input.yaml` is a yaml file that contains configuration for `brave`. Below is detailed explaination of its structure:
+`input.yaml` is a yaml file that contains configuration for **BRAVE**. Below is detailed explaination of its structure:
 
 ### 1. Infrastructure provider details
 Choose an infrastructure_provider by configuring key `infrastructure_provider` in the `input.yaml` file. This provider is the cloud provider where cloud instance will be launched. This single instance will host the entire virtualized environment - all vms and the network. Valid options are `aws`, `oci` and `infra_exists`.  Configuration needs to be provided using key `infrastructure_provider_config`.  
@@ -96,7 +96,7 @@ All OCI infrastructure required to support the cloud instance - vcn, public subn
 
 #### Using pre existing cloud instance 
 
-If one does not wish to launch a cloud instance using **`brave`** OR such an instance pre-exists (in any cloud that supports instances that can run Virtualbox vms), `infra_exists` provider can be  used. If `infra_exists` is selected using key `infrastructure_provider`, SSH connection details need to be configured for **`brave`** to be able to connect to this instance. Use key `infrastructure_provider_config` for providing this configuration as shown in below example. 
+If one does not wish to launch a cloud instance using ****BRAVE**** OR such an instance pre-exists (in any cloud that supports instances that can run Virtualbox vms), `infra_exists` provider can be  used. If `infra_exists` is selected using key `infrastructure_provider`, SSH connection details need to be configured for ****BRAVE**** to be able to connect to this instance. Use key `infrastructure_provider_config` for providing this configuration as shown in below example. 
 
 ```
 infrastructure_provider: infra_exists 
@@ -129,7 +129,7 @@ Choose a provisioner (using key `provisioner` ) and fill out configuration for t
 
 #### Using `vms_only` provisioner 
 
-This provisioner deploys VMs on the cloud instance. Below is an example configuration for using this provisioner to launch VMs on the cloud instance created using `infrastructure_provider`. This configuration instructs `brave` to deploy total 3 Virtualbox VMs:
+This provisioner deploys VMs on the cloud instance. Below is an example configuration for using this provisioner to launch VMs on the cloud instance created using `infrastructure_provider`. This configuration instructs **BRAVE** to deploy total 3 Virtualbox VMs:
      - 2x ubuntu 20.04 VMs with name *workers* and capacity cpu=3vcpus and memory=16GB. These VMs will be named `workers-1` and `workers-2`
      - 1x ubuntu 20.04 VM with name *storage* and capacity cpu=2vcpus and memory=16GB. This VM will be named `storage-1`. 
 
@@ -158,7 +158,7 @@ VMs are described as an array under `provisioner_config.vms_only` key and each a
 
 #### Using `eksabm_cluster` provisioner 
 
-This provisioner creates EKSA-BM cluster on the cloud instance using VMs. Below is an example configuration for using this provisioner to launch EKSA-BM cluster on the cloud instance created using `infrastructure_provider`. This configuration instructs `brave` to create a EKSA-BM cluster named "brave" with K8s version 1.27 and 1 control plane node and 1 worker node. Provisioner will use defaults for all rest of EKSA-BM cluster configuration. 
+This provisioner creates EKSA-BM cluster on the cloud instance using VMs. Below is an example configuration for using this provisioner to launch EKSA-BM cluster on the cloud instance created using `infrastructure_provider`. This configuration instructs **BRAVE** to create a EKSA-BM cluster named "brave" with K8s version 1.27 and 1 control plane node and 1 worker node. Provisioner will use defaults for all rest of EKSA-BM cluster configuration. 
 
 ```sh
 provisioner: eksabm_cluster 

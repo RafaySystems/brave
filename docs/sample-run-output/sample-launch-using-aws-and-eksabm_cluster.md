@@ -1,7 +1,7 @@
 ```sh
 $ source ~/venv-testbeds/env/bin/activate
 
-$ ./launch.py
+$ ./brave.py
 
 [+] Processing input file input.yaml
 

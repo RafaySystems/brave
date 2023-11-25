@@ -1,7 +1,7 @@
 
 ```sh
 $ source venv/bin/activate
-$ python3 ./launch.py
+$ python3 ./brave.py
 [+] Processing input file input.yaml
 
 [+] Generating terraform file tf/oci/terraform.tfvars

@@ -386,7 +386,7 @@ Refer to this [VM Management, Debugging and Advanced Usage](docs/eksa-bm-vm-mgmt
 
 ## Summary 
 
-**BRAVE** presents a robust solution tailored for executing diverse bare metal infrastructure needs in a virtualized, cost-efficient, and automated fashion. It simplifies such deployments by automating the creation of a cloud-based instance on supported cloud providers and then replicating the entire bare metal infrastructure within this cloud instance through Virtualbox and vagrant-managed virtual machines.  Workflows to implement bare metal use cases are offered as provisioners within **BRAVE**. where new use cases can easily be supported by introducing new provisioners.  
+**BRAVE** presents a robust solution tailored for executing diverse bare metal infrastructure needs in a virtualized, cost-efficient, and automated fashion. It simplifies such deployments by automating the creation of a cloud-based instance on supported cloud providers and then replicating the entire bare metal infrastructure within this cloud instance through Virtualbox and vagrant-managed virtual machines.  Workflows to implement bare metal use cases are offered as provisioners within **BRAVE**, where new use cases can easily be supported by introducing new provisioners.  
 
 Overall, **BRAVE** stands as a versatile extensible solution for virtualizing and simplifying bare metal deployments, offering a range of provisioners that cater to different use cases, making it an efficient and cost-effective tool for various non-production scenarios. 
 

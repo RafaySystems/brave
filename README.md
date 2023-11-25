@@ -9,20 +9,22 @@
     - [Install Terraform](#install-terraform)
     - [Install Python3 and dependencies](#install-python3-and-dependencies)
 - [Usage](#usage)
+    - [Structure of Configuration File](#structure-of-configuration-file)
 - [Supported Infrastructure Providers and Provisioners](#supported-infrastructure-providers-and-provisioners)
 - [Supported Use Cases](#supported-use-cases)
      - [Deploying VMs on a Cloud Instance](#deploying-vms-on-a-cloud-instance)
          - [Accessing VMs and Debugging](#accessing-vms-and-debugging)
      - [EKSA Bare Metal Kubernetes Cluster Creation using VMs](#eksa-bare-metal-kubernetes-cluster-creation-using-vms)
-         - [How `b.r.a.v.e` creates EKSA Bare Metal Kubernetes Cluster](#how-brave-creates-eksa-bare-metal-kubernetes-cluster)
+         - [How b.r.a.v.e creates EKSA Bare Metal Kubernetes Cluster](#how-brave-creates-eksa-bare-metal-kubernetes-cluster)
          - [Power Management Algorithm For EKSA-BM](#power-management-algorithm-for-eksa-bm)
          - [Accessing EKSA-BM Cluster](#accessing-eksa-bm-cluster)
          - [Advanced Usage, Debugging and VM Management](#advanced-usage-debugging-and-vm-management)         
+- [Summary](#summary)
 
 ---
 ## Overview
 
-`b.r.a.v.e` (Bare Metal Replication And Virtualization Environment) offers a **virtual**, **cost-efficient**, **convenient**, **automated** and **on-demand** option for executing use cases requiring bare metal infrastructure.  
+`b.r.a.v.e` (Bare Metal Replication And Virtualization Environment) offers a **virtual**, **cost-efficient**, **convenient**, **automated** and **on-demand** tool for executing use cases requiring bare metal infrastructure.  
 
 Cost and complexity of bare metal deployments can be prohibitive for a number of non production use cases such as : 
   - creating **on-demand labs** for conducting quick proof of concepts, demos or experiments 
@@ -44,7 +46,9 @@ Cost and complexity of bare metal deployments can be prohibitive for a number of
 
 3. **EKS Anywhere Bare Metal Cluster Creation using Rafay Controller**: This functionality is supported by `rafay_eksabm_cluster` provisioner.  This provisioner uses [Rafay Systems Inc.](https://docs.rafay.co/clusters/eksa_bm/overview/) Controller for EKSA operations. All other implementation details are same as `eksabm_cluster` provisioner explained above. 
 
-`b.r.a.v.e` is written to be extensible and its functionality can be extended for new bare metal use cases by adding new provisioners. Each provisioner implements tailored workflow specifically designed for utilizing bare metal infrastructure in a particular use cases.
+![brave operations](docs/brave.jpg)
+
+`b.r.a.v.e` is written to be extensible and its functionality can be extended for new bare metal use cases by adding new provisioners. Each provisioner implements tailored workflow specifically designed for utilizing bare metal infrastructure in a particular use case.
 
 `b.r.a.v.e` is a [Rafay Systems Inc.](https://rafay.co/) project. For a comprehensive list of all open-source projects by Rafay, please refer to this [link](https://docs.rafay.co/oss/overview/).
 
@@ -92,7 +96,7 @@ cp -p sample-input.yaml input.yaml
 
 Now edit `input.yaml` as per your setup. 
 
-**Note**: Please select an appropriate `infrastructure_provider` and `provisioner`. You only need to populate `infrastructure_provider_config` and `provisioner_config` for the selected `infrastructure_provider` and `provisioner` respectively. Refer to [discussion on structure of `input.yaml`](docs/input-yaml.md)  for detailed description of the file structure and help on creating an `input.yaml` file. 
+**Note**: Please select an appropriate `infrastructure_provider` and `provisioner`. You only need to populate `infrastructure_provider_config` and `provisioner_config` for the selected `infrastructure_provider` and `provisioner` respectively. Refer to [discussion on structure](docs/input-yaml.md) of `input.yaml` for detailed description of the file structure and help on creating an `input.yaml` file. 
 
 
 2. Source python env 
@@ -116,6 +120,10 @@ source venv/bin/activate
 ```sh
 ./delete.py
 ```
+
+### Structure of Configuration File 
+
+File named `input.yaml` contains all configuration input for `b.r.a.v.e`.  This file describes the desired deployments to create. Refer to [discussion on structure](docs/input-yaml.md)  of `input.yaml` for detailed description of the file's contents. 
 
 ---
 
@@ -239,14 +247,14 @@ Since entire infrastructure is contained within a single cloud instance, the ent
 
 1. `Creating a cloud instance` on a supported cloud or infrastructure provider. [Terraform](https://www.terraform.io/) is used to power this functionality. (A pre-existing compute instance can also be used). Currently supported infrastructure providers are [Oracle Cloud Infrastructure (OCI)](https://www.oracle.com/au/cloud/) and [Amazon Web Services](https://aws.amazon.com/).    
 
-2. Leveraging [Virtualbox](https://www.virtualbox.org/) and [vagrant](https://www.vagrantup.com/) to `create EKSA-BM cluster setup on the cloud instance using vms and a` [NAT Network](https://www.virtualbox.org/manual/ch06.html#network_nat_service). Virtualbox vms are used to emulate cluster hardware and the Admin machine, whereas VirtualBox's NAT Network is used to emulate the Layer2 Network these machines are connected to. This way EKSA-BM machines are connected to each other on a Layer2 network and also able to reach the Internet.  
+2. Leveraging [Virtualbox](https://www.virtualbox.org/) and [vagrant](https://www.vagrantup.com/) to `create EKSA-BM cluster setup on the cloud instance using VMs and a` [NAT Network](https://www.virtualbox.org/manual/ch06.html#network_nat_service). Virtualbox VMs are used to emulate cluster hardware and the Admin machine, whereas VirtualBox's NAT Network is used to emulate the Layer2 Network these machines are connected to. This way EKSA-BM machines are connected to each other on a Layer2 network and also able to reach the Internet.  
 
 
 3. Providing an `automation engine to handle cluster lifecycle management operations` for EKSA-BM clusters end to end without any manual intervention. EKSA-BM cluster's lifecycle can be managed by two  supported provisioners. 
     -   `rafay_eksabm_cluster` which uses [Rafay Systems Inc.](https://docs.rafay.co/clusters/eksa_bm/overview/) Controller
     -   `eksabm_cluster` which uses **eksctl anywhere** cli directly 
 
-4. Automatically handling `power management of cluster machines WITHOUT a BMC controller by watching relevant cluster events` and performing power on and off of vms via VBoxManage cli. (See [below](#power-management-algorithm-for-eksa-bm))
+4. Automatically handling `power management of cluster machines WITHOUT a BMC controller by watching relevant cluster events` and performing power on and off of VMs via VBoxManage cli. (See [below](#power-management-algorithm-for-eksa-bm))
 
 **Note**: End to end creation of cluster (including time to create cloud instance) can range anywhere between 30 to 50 minutes. Please be patient. 
 
@@ -294,7 +302,7 @@ Provisioner `rafay_eksabm_cluster` can also be used to create an EKSA-BM cluster
 
 Since Virtualbox does not support Baseboard Management Controller (BMC) integration,  automatically powering machines on and off is not possible. Without BMC support, machines have to be powered on and off manually at the correct time during provisioning, upgrading and scaling. 
 
-To address this issue, `b.r.a.v.e` implements a power management algorithm that monitors the state of the cluster and perform automatic power management of the Virtualbox vms without requiring BMC integration. Powering on and off of vms is carried our using [VBoxManage](https://www.virtualbox.org/manual/ch08.html) tool. This algorithm is described below: 
+To address this issue, `b.r.a.v.e` implements a power management algorithm that monitors the state of the cluster and perform automatic power management of the Virtualbox vms without requiring BMC integration. Powering on and off of VMs is carried our using [VBoxManage](https://www.virtualbox.org/manual/ch08.html) tool. This algorithm is described below: 
 
 
 ![Power Management Algorithm](docs/powermanage.jpg)
@@ -306,7 +314,7 @@ To address this issue, `b.r.a.v.e` implements a power management algorithm that 
 
 3. Collect Tinkerbell workflows and their status: Pending, Running, Failed, and Success.
 
-4. If there are **Pending or Failed** Tinkerbell workflows, power cycle the respective Virtualbox vms with net boot order to initiate a PXE boot of the machine and start these workflows. Use MAC address to correlate which Tinkerbell workflows correspond to which Virtualbox vms. 
+4. If there are **Pending or Failed** Tinkerbell workflows, power cycle the respective Virtualbox vms with net boot order to initiate a PXE boot of the machine and start these workflows. Use MAC address to correlate which Tinkerbell workflows correspond to which Virtualbox VMs. 
 
 5. Collect machine status from the cluster. Check if any machine is in the **Provisioned** phase. If found, power cycle it with boot order set as disk so that it boots from installed OS on the disk by Tinkerbell workflow and enters **Running** phase.
 
@@ -348,7 +356,7 @@ KUBECONFIG=/opt/rafay/native/brave/brave/brave-eks-a-cluster.kubeconfig kubectl 
 
 
 
-4. To ssh into cluster nodes for debugging, on `eksa-admin` machine ssh into the IP of node vm. The IP address can be derived from `kubectl get nodes -o wide` or from the hardware.csv file under directory `/opt/rafay/native` or `/opt/rafay/eksabm` on `eksa-admin` machine   
+4. To ssh into cluster nodes for debugging, on `eksa-admin` machine ssh into the IP of node VM. The IP address can be derived from `kubectl get nodes -o wide` or from the hardware.csv file under directory `/opt/rafay/native` or `/opt/rafay/eksabm` on `eksa-admin` machine   
 
 ```sh
 sudo su - 
@@ -363,14 +371,22 @@ ssh -i /home/vagrant/ssh_private_key_file ec2-user@ip-of-node-vm
 During cluster creation or for debugging and/or advanced use cases, it is possible to take a look [under the hood](docs/vm-mgmt.md). Some of supported advanced actions are : 
 
 - List all virtual resources created and their status. EKSA-BM specific details such as hardware.csv for clusters are also available   
-- Launch additional vms. This could perhaps be used for manual scaling or upgrades scenarios
-- Delete vms 
-- Watch consoles of the vms for debugging via virtualbox GUI 
-- Connecting to vms over ssh 
-- Resurrecting vms on a reboot or restart of the cloud instance
-- Manually power vms on/off and change boot order 
+- Launch additional VMs. This could perhaps be used for manual scaling or upgrades scenarios
+- Delete VMs 
+- Watch consoles of the VMs for debugging via virtualbox GUI 
+- Connecting to VMs over ssh 
+- Resurrecting VMs on a reboot or restart of the cloud instance
+- Manually power VMs on/off and change boot order 
 
 Refer to this [VM Management, Debugging and Advanced Usage](docs/vm-mgmt.md) doc for more details. 
 
 ---
+
+## Summary 
+
+b.r.a.v.e presents a robust solution tailored for executing diverse bare metal infrastructure needs in a virtualized, cost-efficient, and automated fashion. It simplifies such deployments by automating the creation of a cloud-based instance on supported cloud providers and then replicating the entire bare metal infrastructure within this cloud instance through Virtualbox and vagrant-managed virtual machines.  Workflows to implement bare metal use cases are offered as provisioners within b.r.a.v.e. where new use cases can easily be supported by introducing new provisioners.  
+
+Overall, b.r.a.v.e stands as a versatile extensible solution for virtualizing and simplifying bare metal deployments, offering a range of provisioners that cater to different use cases, making it an efficient and cost-effective tool for various non-production scenarios. 
+
+
 

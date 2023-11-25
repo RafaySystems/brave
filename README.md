@@ -88,7 +88,7 @@ pip3 install -r requirements.txt
 ---
 ##  Usage 
 
-1. A file named `input.yaml` is expected to provide configuration input for `b.r.a.v.e`. This file describes the desired deployment to create. Populate this `input.yaml` file using the provided sample file and then edit it to customize it. 
+1. A file named `input.yaml` is expected to provide configuration input for `b.r.a.v.e`. This file describes the desired deployment to create. Populate this `input.yaml` file using the provided [sample configuration file](sample-input.yaml) and then edit it to customize it. 
 
 ```sh
 cp -p sample-input.yaml input.yaml
@@ -129,10 +129,9 @@ File named `input.yaml` contains all configuration input for `b.r.a.v.e`.  This 
 
 ## Supported Infrastructure Providers and Provisioners
 
-`b.r.a.v.e` supports virtualization of a number of bare metal deployment use cases. To support these, a number of `infrastructure_provider` and  `provisioner` options are exposed which can be used in any combination to fit a particular bare metal deployment use case.  
+`b.r.a.v.e` supports virtualization of a number of bare metal deployment use cases by automatically creating a cloud instance and then executing workflows to spawn virtualized bare metal infrastructure within the cloud instance. Configuration item `infrastructure_provider` determines the public cloud to use and `provisioner` selects workflow to execute. A number of `infrastructure_provider` and `provisioner` settings are exposed which can be used in any combination to fit a particular bare metal deployment use case.
 
-
-Three **`infrastructure_provider`** options are currently supported: 
+The `infrastructure_provider` determines which public cloud is used to deploy the cloud instance to house the virtualized bare metal infrastructure. The options currently supported are:
 
   1. `aws`: Cloud instance is automatically launched in AWS Public Cloud. Instance types of `metal` are required. 
 
@@ -141,7 +140,7 @@ Three **`infrastructure_provider`** options are currently supported:
   3. `infra_exists`: No cloud instance is automatically launched. A pre-existing instance is assumed. SSH access is required to this instance. 
 
 
-Supported **`provisioner`** options are :
+The `provisioner` setting determines workflow that would be run on the cloud instance. Each workflow is targeted to a specific use case for instance creating VMs, creating a cluster etc. Currently supported settings for `provisioner` are :
 
   1. `vms_only`: Supports automatic deployment of virtual machines on the cloud instance. Virtualbox-managed VMs are allocated static IPs on the same layer2 network and have outbound access to the Internet. 
     
@@ -152,7 +151,7 @@ Supported **`provisioner`** options are :
   4. `none`:  No provisioner option. If specified, no provisioner is applied (no VMs etc. created). Possible use case is just creation of the cloud instance. 
 
 
-**Note**: Refer to [discussion on structure of `input.yaml`](docs/input-yaml.md)  for further details. 
+**Note**: Refer to [discussion on structure](docs/input-yaml.md) of `input.yaml` for further details. 
 
 
 ---
@@ -205,15 +204,7 @@ provisioner_config:
 
 Virtualbox VMs are allocated static IPs just like bare metal servers would and ssh connectivity is automatically programmed so that all VMs can be logged into from the cloud instance. For instance, to access VMs created in example [above](#deploying-vms-on-a-cloud-instance) :
 
-1. SSH to the cloud instance. An entry should already have been created in your ~/.ssh/config. Example entry:
-```sh
-Host brave-node
-  Hostname 129.153.193.176
-  StrictHostKeyChecking no
-  IdentityFile /opt/rafay/keys/oci
-  User ubuntu
-```
-To ssh simply use something like `ssh brave-node`
+1. SSH to the cloud instance. An entry should already have been created in your ~/.ssh/config. To ssh, simply use something like `ssh brave-node`
 
 2. From the cloud instance, ssh to the VM by name. You can check the contents of `/home/ubuntu/.ssh/config` for name of VMs
 
@@ -222,6 +213,17 @@ cat /home/ubuntu/.ssh/config
 ssh workers-1
 ```
 
+From the cloud-instance, it is possible to perform a number of debug actions. Some of supported advanced actions are : 
+
+- Connecting to VMs over ssh 
+- List all virtual resources created and their status.
+- Launch VMs
+- Delete VMs 
+- Watch consoles of the VMs for debugging via virtualbox GUI 
+- Resurrecting VMs on a reboot or restart of the cloud instance
+- Manually power VMs on/off and change boot order 
+
+Refer to this [Debugging and VM Management](docs/vm-mgmt-debug.md) doc for more details. 
 
 ###  EKSA Bare Metal Kubernetes Cluster Creation using VMs 
 
@@ -295,7 +297,7 @@ provisioner_config:
     config_file_name: "eksa-bm-config.yaml"    
 ```
 
-Provisioner `rafay_eksabm_cluster` can also be used to create an EKSA-BM cluster. It requires additional configuration related to Rafay controller. Refer to [VM Management, Debugging and Advanced Usage](docs/vm-mgmt.md) doc for more details. 
+Provisioner `rafay_eksabm_cluster` can also be used to create an EKSA-BM cluster. It requires additional configuration related to Rafay controller. Refer to [VM Management, Debugging and Advanced Usage](docs/eksa-bm-vm-mgmt.md) doc for more details. 
 
 
 ### Power Management Algorithm For EKSA-BM 
@@ -368,7 +370,7 @@ ssh -i /home/vagrant/ssh_private_key_file ec2-user@ip-of-node-vm
 
 ###  Advanced Usage, Debugging and VM Management
 
-During cluster creation or for debugging and/or advanced use cases, it is possible to take a look [under the hood](docs/vm-mgmt.md). Some of supported advanced actions are : 
+During cluster creation or for debugging and/or advanced use cases, it is possible to take a look [under the hood](docs/eksa-bm-vm-mgmt.md). Some of supported advanced actions are : 
 
 - List all virtual resources created and their status. EKSA-BM specific details such as hardware.csv for clusters are also available   
 - Launch additional VMs. This could perhaps be used for manual scaling or upgrades scenarios
@@ -378,7 +380,7 @@ During cluster creation or for debugging and/or advanced use cases, it is possib
 - Resurrecting VMs on a reboot or restart of the cloud instance
 - Manually power VMs on/off and change boot order 
 
-Refer to this [VM Management, Debugging and Advanced Usage](docs/vm-mgmt.md) doc for more details. 
+Refer to this [VM Management, Debugging and Advanced Usage](docs/eksa-bm-vm-mgmt.md) doc for more details. 
 
 ---
 

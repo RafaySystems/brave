@@ -15,7 +15,7 @@
 
 ## EKSA-BM VM management 
 
-**`brave`** emulates the entire EKSA-BM infrastructure on a **single cloud** instance. It leverages [Virtualbox](https://www.virtualbox.org/) and [vagrant](https://www.vagrantup.com/) to `create VMs and a` [NAT Network](https://www.virtualbox.org/manual/ch06.html#network_nat_service). 
+****BRAVE**** emulates the entire EKSA-BM infrastructure on a **single cloud** instance. It leverages [Virtualbox](https://www.virtualbox.org/) and [vagrant](https://www.vagrantup.com/) to `create VMs and a` [NAT Network](https://www.virtualbox.org/manual/ch06.html#network_nat_service). 
 
 Virtualbox VMs are used to emulate cluster hardware and the **Admin machine**, whereas VirtualBox's NAT Network is used to emulate the Layer2 Network these machines are connected to. This way EKSA-BM machines are connected to each other on a Layer2 network and also are able to reach the Internet. 
 

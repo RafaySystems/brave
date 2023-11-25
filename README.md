@@ -1,4 +1,4 @@
-# brave
+# BRAVE
 `Bare Metal Replication And Virtualization Environment`
 
 ---
@@ -15,7 +15,7 @@
      - [Deploying VMs on a Cloud Instance](#deploying-vms-on-a-cloud-instance)
          - [Accessing VMs and Debugging](#accessing-vms-and-debugging)
      - [EKSA Bare Metal Kubernetes Cluster Creation using VMs](#eksa-bare-metal-kubernetes-cluster-creation-using-vms)
-         - [How brave creates EKSA Bare Metal Kubernetes Cluster](#how-brave-creates-eksa-bare-metal-kubernetes-cluster)
+         - [How BRAVE creates EKSA Bare Metal Kubernetes Cluster](#how-brave-creates-eksa-bare-metal-kubernetes-cluster)
          - [Power Management Algorithm For EKSA-BM](#power-management-algorithm-for-eksa-bm)
          - [Accessing EKSA-BM Cluster](#accessing-eksa-bm-cluster)
          - [Advanced Usage, Debugging and VM Management](#advanced-usage-debugging-and-vm-management)         
@@ -24,13 +24,13 @@
 ---
 ## Overview
 
-`brave` (Bare Metal Replication And Virtualization Environment) offers a **virtual**, **cost-efficient**, **convenient**, **automated** and **on-demand** tool for executing use cases requiring bare metal infrastructure.  
+**BRAVE** (Bare Metal Replication And Virtualization Environment) offers a **virtual**, **cost-efficient**, **convenient**, **automated** and **on-demand** tool for executing use cases requiring bare metal infrastructure.  
 
 Cost and complexity of bare metal deployments can be prohibitive for a number of non production use cases such as : 
   - creating **on-demand labs** for conducting quick proof of concepts, demos or experiments 
   - creating **testbed environments** for development, debugging and automated testing 
 
-`brave` simplifies and streamlines bare metal deployments (especially for non production use cases) by: 
+**BRAVE** simplifies and streamlines bare metal deployments (especially for non production use cases) by: 
 
 - Providing fully automated instantiation of a singular cloud-based instance on one of the supported cloud providers (currently [Oracle Cloud Infrastructure](https://www.oracle.com/au/cloud/) and [Amazon Web Services](https://aws.amazon.com/) are supported) 
 
@@ -38,19 +38,19 @@ Cost and complexity of bare metal deployments can be prohibitive for a number of
 
 - Providing multiple provisioners that execute tailored workflows specifically designed for utilizing bare metal infrastructure in various use cases.
 
-`brave` facilitates a spectrum of automated workflows through its provisioners:
+**BRAVE** facilitates a spectrum of automated workflows through its provisioners:
 
-1. **VM Deployment**: Enables deployment of mutiple virtual machines with configurable capacity and OS flavours on a single layer 2 network. These virtual machines are allocated static IPs and have outbound access to the Internet. This setup serves as a versatile deployment solution for interconnected bare metal servers. `brave` also configures SSH access to these VMs from the hosting cloud instance. This capability is supported by the `vms_only` provisioner.
+1. **VM Deployment**: Enables deployment of mutiple virtual machines with configurable capacity and OS flavours on a single layer 2 network. These virtual machines are allocated static IPs and have outbound access to the Internet. This setup serves as a versatile deployment solution for interconnected bare metal servers. **BRAVE** also configures SSH access to these VMs from the hosting cloud instance. This capability is supported by the `vms_only` provisioner.
 
-2. **EKS Anywhere Bare Metal Cluster Creation**: Facilitates the creation of an EKS Anywhere Bare Metal (EKSA-BM) Kubernetes cluster.  Virtualbox-managed VMs emulate an EKSA admin machine along with all cluster machines. Interconnectivity among these EKSA machines is achieved through a Virtualbox NAT network, allowing cluster machines to PXE boot from the admin machine and install software from the Internet.  `brave` also implements a power management algorithm that monitors the state of the cluster and perform automatic power on and off of the Virtualbox VMs without requiring BMC integration. This power management is mandatory for automated provisioning of an EKSA cluster. This functionality is supported by `eksabm_cluster` provisioner.  This provisioner uses **eksctl anywhere** cli for EKSA operations. 
+2. **EKS Anywhere Bare Metal Cluster Creation**: Facilitates the creation of an EKS Anywhere Bare Metal (EKSA-BM) Kubernetes cluster.  Virtualbox-managed VMs emulate an EKSA admin machine along with all cluster machines. Interconnectivity among these EKSA machines is achieved through a Virtualbox NAT network, allowing cluster machines to PXE boot from the admin machine and install software from the Internet.  **BRAVE** also implements a power management algorithm that monitors the state of the cluster and perform automatic power on and off of the Virtualbox VMs without requiring BMC integration. This power management is mandatory for automated provisioning of an EKSA cluster. This functionality is supported by `eksabm_cluster` provisioner.  This provisioner uses **eksctl anywhere** cli for EKSA operations. 
 
 3. **EKS Anywhere Bare Metal Cluster Creation using Rafay Controller**: This functionality is supported by `rafay_eksabm_cluster` provisioner.  This provisioner uses [Rafay Systems Inc.](https://docs.rafay.co/clusters/eksa_bm/overview/) Controller for EKSA operations. All other implementation details are same as `eksabm_cluster` provisioner explained above. 
 
 ![brave operations](docs/brave.jpg)
 
-`brave` is written to be extensible and its functionality can be extended for new bare metal use cases by adding new provisioners. Each provisioner implements tailored workflow specifically designed for utilizing bare metal infrastructure in a particular use case.
+**BRAVE** is written to be extensible and its functionality can be extended for new bare metal use cases by adding new provisioners. Each provisioner implements tailored workflow specifically designed for utilizing bare metal infrastructure in a particular use case.
 
-`brave` is a [Rafay Systems Inc.](https://rafay.co/) project. For a comprehensive list of all open-source projects by Rafay, please refer to this [link](https://docs.rafay.co/oss/overview/).
+**BRAVE** is a [Rafay Systems Inc.](https://rafay.co/) project. For a comprehensive list of all open-source projects by Rafay, please refer to this [link](https://docs.rafay.co/oss/overview/).
 
 ---
 
@@ -88,7 +88,7 @@ pip3 install -r requirements.txt
 ---
 ##  Usage 
 
-1. A file named `input.yaml` is expected to provide configuration input for `brave`. This file describes the desired deployment to create. Populate this `input.yaml` file using the provided [sample configuration file](sample-input.yaml) and then edit it to customize it. 
+1. A file named `input.yaml` is expected to provide configuration input for **BRAVE**. This file describes the desired deployment to create. Populate this `input.yaml` file using the provided [sample configuration file](sample-input.yaml) and then edit it to customize it. 
 
 ```sh
 cp -p sample-input.yaml input.yaml
@@ -105,14 +105,14 @@ Now edit `input.yaml` as per your setup.
 source venv/bin/activate
 ```
 
-3. Launch **`brave`** . Below will create the deployment defined in `input.yaml` file using specified `infrastructure_provider` and `provisioner`. Sample execution outputs are availaible in **docs/sample-run-output/** directory for reference. 
+3. Launch **BRAVE** . Below will create the deployment defined in `input.yaml` file using specified `infrastructure_provider` and `provisioner`. Sample execution outputs are availaible in **docs/sample-run-output/** directory for reference. 
 
 
 ```sh
-./launch.py
+./brave.py
 ```
 
-**Note**:: If you wish to follow along and look under the hood while `brave` is doing its job, refer to [Advanced Usage, Debugging and VM Management](#advanced-usage-debugging-and-vm-management)
+**Note**:: If you wish to follow along and look under the hood while **BRAVE** is doing its job, refer to [Advanced Usage, Debugging and VM Management](#advanced-usage-debugging-and-vm-management)
 
 
 4. Deleting existing setup as specified in input.yaml (also tears down the cloud instance depending on infrastructure provider selected)
@@ -123,13 +123,13 @@ source venv/bin/activate
 
 ### Structure of Configuration File 
 
-File named `input.yaml` contains all configuration input for `brave`.  This file describes the desired deployments to create. Refer to [discussion on structure](docs/input-yaml.md)  of `input.yaml` for detailed description of the file's contents. 
+File named `input.yaml` contains all configuration input for **BRAVE**.  This file describes the desired deployments to create. Refer to [discussion on structure](docs/input-yaml.md)  of `input.yaml` for detailed description of the file's contents. 
 
 ---
 
 ## Supported Infrastructure Providers and Provisioners
 
-`brave` supports virtualization of a number of bare metal deployment use cases by automatically creating a cloud instance and then executing workflows to spawn virtualized bare metal infrastructure within the cloud instance. Configuration item `infrastructure_provider` determines the public cloud to use and `provisioner` selects workflow to execute. A number of `infrastructure_provider` and `provisioner` settings are exposed which can be used in any combination to fit a particular bare metal deployment use case.
+**BRAVE** supports virtualization of a number of bare metal deployment use cases by automatically creating a cloud instance and then executing workflows to spawn virtualized bare metal infrastructure within the cloud instance. Configuration item `infrastructure_provider` determines the public cloud to use and `provisioner` selects workflow to execute. A number of `infrastructure_provider` and `provisioner` settings are exposed which can be used in any combination to fit a particular bare metal deployment use case.
 
 The `infrastructure_provider` determines which public cloud is used to deploy the cloud instance to house the virtualized bare metal infrastructure. The options currently supported are:
 
@@ -158,17 +158,17 @@ The `provisioner` setting determines workflow that would be run on the cloud ins
 
 ##  Supported Use Cases 
 
-`brave` facilitates a spectrum of automated workflows through its provisioners. Below is a discussion of these provisioners and the use cases they support in detail.
+**BRAVE** facilitates a spectrum of automated workflows through its provisioners. Below is a discussion of these provisioners and the use cases they support in detail.
 
 
 ### Deploying VMs on a Cloud Instance  
 
 Most conventional bare metal deployments encompass a small network of interconnected servers capable of direct communication among themselves and with external networks through a designated gateway. However, setting up non-production replicas of such deployments for testing, evaluations, demonstrations, or development purposes can become cost-prohibitive, primarily due to hardware specifications.
 
-`brave` offers a solution to virtualize these deployments, substantially reducing costs and hardware requirements. This is achieved by employing Virtualbox and vagrant managed VMs to replicate bare metal servers and utilizing Virtualbox networking capabilities to establish the necessary networking infrastructure within a single cloud instance, available on supported public clouds. All essential software and packages are automatically installed on this cloud instance.
+**BRAVE** offers a solution to virtualize these deployments, substantially reducing costs and hardware requirements. This is achieved by employing Virtualbox and vagrant managed VMs to replicate bare metal servers and utilizing Virtualbox networking capabilities to establish the necessary networking infrastructure within a single cloud instance, available on supported public clouds. All essential software and packages are automatically installed on this cloud instance.
 
 
-As an example, below excerpt of `input.yaml` instructs `brave` to 
+As an example, below excerpt of `input.yaml` instructs **BRAVE** to 
 - Provision a cloud instance named "brave-node" in OCI public cloud (`infrastructure_provider` is set as `oci`)
 - Deploy total 3 Virtualbox VMs on this instance (`provisioner` is set as `vms_only`):
      - 2x ubuntu 20.04 VMs with name *workers* and capacity cpu=3vcpus and memory=16GB. These VMs will be named `workers-1` and `workers-2`
@@ -229,11 +229,11 @@ Refer to this [Debugging and VM Management](docs/vm-mgmt-debug.md) doc for more 
 
 EKS Anywhere Bare Metal (EKSA-BM) Kubernetes cluster creation can be non trivial and cost prohibitive for certain non production use cases as there are extensive [hardware and networking requirements](docs/eksabm-pre-reqs.md) to meet.  
 
-`brave`  makes it possible to create non production EKSA-BM clusters without having access to specialized hardware or networking setup. With `brave` , extensive [hardware and networking requirements](docs/eksabm-pre-reqs.md) of an EKSA-BM cluster are reduced to just a **single** requirement :
+**BRAVE**  makes it possible to create non production EKSA-BM clusters without having access to specialized hardware or networking setup. With **BRAVE** , extensive [hardware and networking requirements](docs/eksabm-pre-reqs.md) of an EKSA-BM cluster are reduced to just a **single** requirement :
 
 - Having permission to launch a **single cloud instance** in a supported cloud provider (AWS and OCI are currently supported). 
 
-`brave` can:
+**BRAVE** can:
 1. Launch an instance in a cloud provider.
 2. Inside this cloud instance, create all infrastructure required for supporting an EKSA-BM cluster. This includes vms to emulate the machines and the network.  
 3. Using this virtual infrastructure, create an EKSA-BM cluster **without any power management support** (fully automated end to end). 
@@ -241,11 +241,11 @@ EKS Anywhere Bare Metal (EKSA-BM) Kubernetes cluster creation can be non trivial
 Since entire infrastructure is contained within a single cloud instance, the entire infrastructure can be shut down by just stopping the cloud instance. This is not only convenient (no hardware required) but also cost effective.  Simply start the instance back up when you wish to restart the cluster.  
 
 
-#### How `brave` creates EKSA Bare Metal Kubernetes Cluster 
+#### How **BRAVE** creates EKSA Bare Metal Kubernetes Cluster 
 
 ![EKSA BM setup using brave](docs/eksabm-network.jpg)
 
-`brave` simplifies EKSA-BM cluster creation by emulating the entire networking and bare metal setup required for creating EKSA-BM clusters on a **single cloud instance** of a cloud provider. `brave` achieves this by:
+**BRAVE** simplifies EKSA-BM cluster creation by emulating the entire networking and bare metal setup required for creating EKSA-BM clusters on a **single cloud instance** of a cloud provider. **BRAVE** achieves this by:
 
 1. `Creating a cloud instance` on a supported cloud or infrastructure provider. [Terraform](https://www.terraform.io/) is used to power this functionality. (A pre-existing compute instance can also be used). Currently supported infrastructure providers are [Oracle Cloud Infrastructure (OCI)](https://www.oracle.com/au/cloud/) and [Amazon Web Services](https://aws.amazon.com/).    
 
@@ -261,12 +261,12 @@ Since entire infrastructure is contained within a single cloud instance, the ent
 **Note**: End to end creation of cluster (including time to create cloud instance) can range anywhere between 30 to 50 minutes. Please be patient. 
 
 
-As an example, below excerpt of `input.yaml` instructs `brave` to 
+As an example, below excerpt of `input.yaml` instructs **BRAVE** to 
 - Provision a cloud instance named "brave-node" in OCI public cloud (`infrastructure_provider` is set as `oci`)
 - Create an EKSA-BM cluster (`provisioner` is set as `eksabm_cluster`):
-- Cluster will be named `brave`, use K8s version 1.27 and have 1 control plane node and 1 worker node.
+- Cluster will be named **BRAVE**, use K8s version 1.27 and have 1 control plane node and 1 worker node.
 
-`brave` would launch one VM to emulate the admin machine and 2 VMs to emulate the nodes.  
+**BRAVE** would launch one VM to emulate the admin machine and 2 VMs to emulate the nodes.  
 
 ```sh
 infrastructure_provider: oci  
@@ -286,7 +286,7 @@ provisioner_config:
     num_worker_nodes: 1    
 ```
 
-It is also possile to customize the EKSA-BM cluster configuration extensively by provising an EKSA-BM configuration file to the provisioner. In below example, `brave` is instructed to create an EKSA-BM cluster and use a configuration file name "eksa-bm-config.yaml" for configuration of the cluster. 
+It is also possile to customize the EKSA-BM cluster configuration extensively by provising an EKSA-BM configuration file to the provisioner. In below example, **BRAVE** is instructed to create an EKSA-BM cluster and use a configuration file name "eksa-bm-config.yaml" for configuration of the cluster. 
 
 ```sh
 provisioner: eksabm_cluster 
@@ -304,7 +304,7 @@ Provisioner `rafay_eksabm_cluster` can also be used to create an EKSA-BM cluster
 
 Since Virtualbox does not support Baseboard Management Controller (BMC) integration,  automatically powering machines on and off is not possible. Without BMC support, machines have to be powered on and off manually at the correct time during provisioning, upgrading and scaling. 
 
-To address this issue, `brave` implements a power management algorithm that monitors the state of the cluster and perform automatic power management of the Virtualbox vms without requiring BMC integration. Powering on and off of VMs is carried our using [VBoxManage](https://www.virtualbox.org/manual/ch08.html) tool. This algorithm is described below: 
+To address this issue, **BRAVE** implements a power management algorithm that monitors the state of the cluster and perform automatic power management of the Virtualbox vms without requiring BMC integration. Powering on and off of VMs is carried our using [VBoxManage](https://www.virtualbox.org/manual/ch08.html) tool. This algorithm is described below: 
 
 
 ![Power Management Algorithm](docs/powermanage.jpg)
@@ -386,9 +386,9 @@ Refer to this [VM Management, Debugging and Advanced Usage](docs/eksa-bm-vm-mgmt
 
 ## Summary 
 
-brave presents a robust solution tailored for executing diverse bare metal infrastructure needs in a virtualized, cost-efficient, and automated fashion. It simplifies such deployments by automating the creation of a cloud-based instance on supported cloud providers and then replicating the entire bare metal infrastructure within this cloud instance through Virtualbox and vagrant-managed virtual machines.  Workflows to implement bare metal use cases are offered as provisioners within brave. where new use cases can easily be supported by introducing new provisioners.  
+**BRAVE** presents a robust solution tailored for executing diverse bare metal infrastructure needs in a virtualized, cost-efficient, and automated fashion. It simplifies such deployments by automating the creation of a cloud-based instance on supported cloud providers and then replicating the entire bare metal infrastructure within this cloud instance through Virtualbox and vagrant-managed virtual machines.  Workflows to implement bare metal use cases are offered as provisioners within **BRAVE**. where new use cases can easily be supported by introducing new provisioners.  
 
-Overall, brave stands as a versatile extensible solution for virtualizing and simplifying bare metal deployments, offering a range of provisioners that cater to different use cases, making it an efficient and cost-effective tool for various non-production scenarios. 
+Overall, **BRAVE** stands as a versatile extensible solution for virtualizing and simplifying bare metal deployments, offering a range of provisioners that cater to different use cases, making it an efficient and cost-effective tool for various non-production scenarios. 
 
 
 

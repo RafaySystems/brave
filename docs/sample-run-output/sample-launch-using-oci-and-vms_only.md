@@ -3,7 +3,7 @@
 ```sh
 $ source venv/bin/activate
 
-$ ./launch.py
+$ ./brave.py
 
 [+] Processing input file input.yaml
 

@@ -96,7 +96,7 @@ All OCI infrastructure required to support the cloud instance - vcn, public subn
 
 #### Using pre existing cloud instance 
 
-If one does not wish to launch a cloud instance using ****BRAVE**** OR such an instance pre-exists (in any cloud that supports instances that can run Virtualbox vms), `infra_exists` provider can be  used. If `infra_exists` is selected using key `infrastructure_provider`, SSH connection details need to be configured for ****BRAVE**** to be able to connect to this instance. Use key `infrastructure_provider_config` for providing this configuration as shown in below example. 
+If one does not wish to launch a cloud instance using **BRAVE** OR such an instance pre-exists (in any cloud that supports instances that can run Virtualbox vms), `infra_exists` provider can be  used. If `infra_exists` is selected using key `infrastructure_provider`, SSH connection details need to be configured for **BRAVE** to be able to connect to this instance. Use key `infrastructure_provider_config` for providing this configuration as shown in below example. 
 
 ```
 infrastructure_provider: infra_exists 

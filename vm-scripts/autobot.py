@@ -1284,14 +1284,31 @@ def create_eksabm_cp_dp_vms(cp_count, dp_count, cluster_name):
 # launch vbox vms for eksabm clusters
 def launch_eksabm_vbox_vms(input_data):
     
+    cluster_name=""
+    cp_count=dp_count=0
     #infrastructure_provider = input_data["infrastructure_provider"]
     #infrastructure_provider_data = input_data["infrastructure_provider_config"][infrastructure_provider]
     provisioner = input_data["provisioner"]
     provisioner_config = input_data["provisioner_config"][provisioner]
 
-    cluster_name = provisioner_config["cluster_name"]
-    cp_count = provisioner_config["num_control_plane_nodes"]
-    dp_count = provisioner_config["num_worker_nodes"]
+    try:
+        cluster_yaml_filename = provisioner_config["config_file_name"]
+    except KeyError:
+        cluster_yaml_filename = None 
+
+    if cluster_yaml_filename is None:
+        cluster_name = provisioner_config["cluster_name"]
+        cp_count = provisioner_config["num_control_plane_nodes"]
+        dp_count = provisioner_config["num_worker_nodes"]
+    else:
+        cluster_name = provisioner_config["cluster_name"]
+        cluster_yaml_file=f'{staging_dir}/cluster_configs/{cluster_yaml_filename}'
+
+        if os.path.exists(cluster_yaml_file):
+                k8s_version,cp_count,dp_count,cluster_yaml = extract_cluster_details_from_cluster_yaml(cluster_yaml_file,provisioner)
+        else:
+            print(f"\nERROR:: cluster file {cluster_yaml_file} does not exist for cluster {cluster_name}")
+            sys.exit(1)
 
     if cp_count <= 0 or dp_count <= 0:
         print(f"\nERROR:: CP and DP VMs count cannot be 0 or negative")

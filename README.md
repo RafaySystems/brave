@@ -27,8 +27,9 @@
 **BRAVE** (Bare Metal Replication And Virtualization Environment) offers a **virtual**, **cost-efficient**, **convenient**, **automated** and **on-demand** tool for executing use cases requiring bare metal infrastructure.  
 
 Cost and complexity of bare metal deployments can be prohibitive for a number of non production use cases such as : 
-  - creating **on-demand labs** for conducting quick proof of concepts, demos or experiments 
-  - creating **testbed environments** for development, debugging and automated testing 
+  - Creating **on-demand labs** for conducting quick proof of concepts, demonstrations or experiments 
+  - Creating **testbed environments** for development, debugging and automated testing 
+  - Performing comprehensive architectural and security assessments through construction of proof of concept deployments.
 
 **BRAVE** simplifies and streamlines bare metal deployments (especially for non production use cases) by: 
 
@@ -46,7 +47,7 @@ Cost and complexity of bare metal deployments can be prohibitive for a number of
 
 3. **EKS Anywhere Bare Metal Cluster Creation using Rafay Controller**: This functionality is supported by `rafay_eksabm_cluster` provisioner.  This provisioner uses [Rafay Systems Inc.](https://docs.rafay.co/clusters/eksa_bm/overview/) Controller for EKSA operations. All other implementation details are same as `eksabm_cluster` provisioner explained above. 
 
-![brave operations](docs/brave.jpg)
+![brave operations](docs/brave.png)
 
 **BRAVE** is written to be extensible and its functionality can be extended for new bare metal use cases by adding new provisioners. Each provisioner implements tailored workflow specifically designed for utilizing bare metal infrastructure in a particular use case.
 
@@ -243,7 +244,7 @@ Since entire infrastructure is contained within a single cloud instance, the ent
 
 #### How **BRAVE** creates EKSA Bare Metal Kubernetes Cluster 
 
-![EKSA BM setup using brave](docs/eksabm-network.jpg)
+![EKSA BM setup using brave](docs/eksabm-network.png)
 
 **BRAVE** simplifies EKSA-BM cluster creation by emulating the entire networking and bare metal setup required for creating EKSA-BM clusters on a **single cloud instance** of a cloud provider. **BRAVE** achieves this by:
 
@@ -307,7 +308,7 @@ Since Virtualbox does not support Baseboard Management Controller (BMC) integrat
 To address this issue, **BRAVE** implements a power management algorithm that monitors the state of the cluster and perform automatic power management of the Virtualbox vms without requiring BMC integration. Powering on and off of VMs is carried our using [VBoxManage](https://www.virtualbox.org/manual/ch08.html) tool. This algorithm is described below: 
 
 
-![Power Management Algorithm](docs/powermanage.jpg)
+![Power Management Algorithm](docs/powermanage.png)
 
 
 1. Start a loop to monitor cluster progress.

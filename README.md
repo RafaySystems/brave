@@ -322,6 +322,27 @@ To address this issue, **BRAVE** implements a power management algorithm that mo
 
 6. Repeat the loop until all machines are in the **Running** phase, signifying the completion of cluster creation.
 
+Below is excerpt from **BRAVE**'s output demonstrating above power management algorithm in action. 
+
+```sh
+$ ./brave.py
+....
+....
+[11.] Fetching Tinkerbell workflows from cluster : KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get workflows -A -o yaml
+   [+] Fetching machine status from cluster to perform power management tasks: KUBECONFIG=/opt/rafay/native/brave/brave/generated/brave.kind.kubeconfig kubectl get machines.cluster.x-k8s.io -A
+   [+] Execution of command to fetch machine status passed. stdout:
+ NAMESPACE     NAME                               CLUSTER   NODENAME      PROVIDERID                              PHASE          AGE   VERSION
+eksa-system   brave-fnlgp                        brave     brave-fnlgp   tinkerbell://eksa-system/brave-cp-n-1   Running        10m   v1.27.4-eks-1-27-10
+eksa-system   brave-ng1-5899b4fd4bxjhh86-zqdgl   brave                                                           Provisioning   10m   v1.27.4-eks-1-27-10
+
+   [+] Tinkerbell workflows detected: PENDING:['brave-dp-n-1'] RUNNING:[] FAILED:[] SUCCESS:['brave-cp-n-1']
+   [+] Power cycling nodes with Tinkerbell workflows (boot order net) PENDING:['brave-dp-n-1'] OR FAILED:[]
+   [+] Powering on cluster node brave-dp-n-1 with boot order net
+   [+] Detected machines in phases ['Running', 'Provisioning']
+   [+]  .... waiting for 5 minutes to recheck logs ....
+...
+...
+```
 
 ###  Accessing EKSA-BM Cluster
 

@@ -10,6 +10,7 @@
     - [Install Python3 and dependencies](#install-python3-and-dependencies)
 - [Usage](#usage)
     - [Structure of Configuration File](#structure-of-configuration-file)
+    - [Multiple BRAVE Environments](#multiple-brave-environments)
 - [Supported Infrastructure Providers and Provisioners](#supported-infrastructure-providers-and-provisioners)
 - [Supported Use Cases](#supported-use-cases)
      - [Deploying VMs on a Cloud Instance](#deploying-vms-on-a-cloud-instance)
@@ -125,6 +126,11 @@ source venv/bin/activate
 ### Structure of Configuration File 
 
 File named `input.yaml` contains all configuration input for **BRAVE**.  This file describes the desired deployments to create. Refer to [discussion on structure](docs/input-yaml.md)  of `input.yaml` for detailed description of the file's contents. 
+
+
+### Multiple BRAVE Environments  
+
+The file directory housing a BRAVE environment defines its enclosure. To run multiple environments simultaneously, utilize a separate directory for each environment.
 
 ---
 

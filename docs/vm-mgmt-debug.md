@@ -160,7 +160,7 @@ This command will create two VMs `brave-1` and `brave-2` with defaults.
 ```sh
 sudo su -
 bash /opt/rafay/vm-scripts/delete-vm.sh
-Usage: /opt/rafay/vm-scripts/delete-vm.sh  [-v <vm_name>]
+Usage: /opt/rafay/vm-scripts/delete-vm.sh  -v <vm_name>
 
 ```
 

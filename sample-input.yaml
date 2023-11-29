@@ -1,3 +1,6 @@
+### Please refer to https://github.com/RafaySystems/brave/blob/main/docs/input-yaml.md for ready to use configuration examples 
+
+
 # Infrastructure provider  !! CHANGE THIS TO YOUR INFRASTRUCTURE PROVIDER (aws, oci or infra_exists) 
 infrastructure_provider: oci  
 

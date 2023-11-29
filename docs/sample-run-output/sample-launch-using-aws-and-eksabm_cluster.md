@@ -1,5 +1,5 @@
 ```sh
-$ source ~/venv-testbeds/env/bin/activate
+$ source venv/bin/activate
 
 $ ./brave.py
 

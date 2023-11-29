@@ -178,7 +178,9 @@ def create_gateway(rafay_controller_url, headers, gw_name, gw_type, gw_descripti
            "gatewayType": gw_type
        }
     }
-
+    
+    print(f"\n[{seq}.] Creating Gateway gw_name:{gw_name}, gw_type:{gw_type}, gw_description:{gw_description}, project_id:{project_id}")
+    
     resp = make_request(url, method, headers, data)
     if resp:
         print(f"\n[{seq}.] Gateway creation successful. gw_name:{gw_name}, gw_type:{gw_type}, gw_description:{gw_description}, project_id:{project_id}")
@@ -229,7 +231,7 @@ def get_gateway_setup_cmd(rafay_controller_url, headers, gw_name, project_id, se
 
 # execute gateway setup command 
 def execute_gateway_setup_cmd(host, port, username, password, setup_command, seq=1):
-    print(f"[{seq}.] Gateway setup command execution started ...{setup_command}")
+    print(f"\n[{seq}.] Gateway setup command execution started ...{setup_command}")
     full_command = f"sudo su -c '{setup_command}'"
     stdout,err = execute_remote_command(host, port, username, password, full_command)
     if err:
@@ -372,6 +374,8 @@ def create_eksabm_cluster(rafay_controller_url, headers,cluster_name, project_id
     url = rafay_controller_url+'/v2/infra/project/'+project_id+'/cluster'
     method = 'POST'
 
+    print(f"\n[{seq}.] Creating cluster cluster_name:{cluster_name}, project_id:{project_id}")
+    
     data = build_eksabm_cluster_create_data_dict(cluster_name,ssh_public_key)
     resp = make_request(url, method, headers, data)
     if resp:
@@ -1532,9 +1536,13 @@ def eksabm_rafay_provisioner(input_data):
     print(f"\n[+] Detected desired cluster spec for provision::  cluster_name: {cluster_name}, k8s_version:{k8s_version}, cp_count:{cp_count}, dp_count:{dp_count}")
     
     rafay_controller_url = provisioner_config["rafay_controller_url"]
+    # check for trailing / in rafay_controller_url and remove it
+    if rafay_controller_url.endswith('/'):
+        rafay_controller_url = rafay_controller_url[:-1]
+
     rafay_api_key_file = provisioner_config["rafay_api_key_file"]
     rafay_project_name = provisioner_config["rafay_project_name"]
-    gw_name = provisioner_config["gw_name"]
+    gw_name = provisioner_config["rafay_eksabm_gateway_name"]
     ssh_public_key = infrastructure_provider_data["ssh_public_key"]
 
     print(f"\n[+] Detected cluster provisioner config:: cluster_provisioner: rafay_eksabm_cluster, rafay_controller_url: {rafay_controller_url}, rafay_api_key_file:{rafay_api_key_file}, rafay_project_name:{rafay_project_name}, gw_name:{gw_name}")
@@ -1583,7 +1591,7 @@ def eksabm_rafay_provisioner(input_data):
     
     # Step 1. Create gateway if it doesn't exist 
     print(f"\n[+] Step 1. Creating gateway: {gw_name}")
-
+    print(f"\n[+] Checking if gateway {gw_name} already exists")
     gw = get_gateway(rafay_controller_url, headers, gw_name, project_id)
     if gw is not None:
         print(f'Gateway {gw_name} already exists, skipping creation')
@@ -1603,9 +1611,10 @@ def eksabm_rafay_provisioner(input_data):
     check_gateway_status(rafay_controller_url, headers, gw_name, project_id, 5)
     
     # Step 6. Create cluster
+    print(f"\n[+] Checking if cluster {cluster_name} already exists")
     cl = get_cluster(rafay_controller_url, headers, cluster_name, project_id)
     if cl is not None:
-        print(f'Cluster {cluster_name} already exists, skipping creation')
+        print(f'\n[+] Cluster {cluster_name} already exists, skipping creation')
     else:
         create_eksabm_cluster(rafay_controller_url, headers, cluster_name, project_id,ssh_public_key, 6)
     

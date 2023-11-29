@@ -203,6 +203,9 @@ if __name__ == "__main__":
             rafay_api_key = f.read().strip() 
 
         rafay_controller_url = provisioner_config["rafay_controller_url"]
+        # check for trailing / in rafay_controller_url and remove it
+        if rafay_controller_url.endswith('/'):
+            rafay_controller_url = rafay_controller_url[:-1]
         gw_name = provisioner_config["rafay_eksabm_gateway_name"]
         rafay_project_name = provisioner_config["rafay_project_name"]
         cluster_name = provisioner_config["cluster_name"]

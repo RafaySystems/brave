@@ -131,7 +131,9 @@ b'[+] Flushing local iptables\n[+] Creating natnetwork eksa-net with cidr 192.16
 [+] Commencing cluster provision for cluster_name: brave, gw brave-gw, project robbie using provisioner rafay
 
 [+] Step 1. Creating gateway: brave-gw
+[+] Checking if gateway brave-gw already exists
 
+[1.] Creating Gateway gw_name:brave-gw, gw_type:eksaBareMetal, gw_description:brave-gw, project_id:kr919wk
 [1.] Gateway creation successful. gw_name:brave-gw, gw_type:eksaBareMetal, gw_description:brave-gw, project_id:kr919wk
 
 [2.] Gateway setupCommand retrieval successful

@@ -480,10 +480,10 @@ def build_eksabm_cluster_update_data_dict(rafay_controller_url, headers, gw_name
     hardware_entries = parse_hardware_csv_file(hardware_csv_location)
 
     if cluster_yaml is not None:
-        updated_cluster_yaml = update_tinkerbell_ip(cluster_yaml, tinkerbell_ip, 'rafay')
-        updated_cluster_yaml = update_endpoint_ip(updated_cluster_yaml, endpoint_host_ip, 'rafay')
-        updated_cluster_yaml = update_gateway_id(updated_cluster_yaml, gateway_id, 'rafay')
-        updated_cluster_yaml = update_hardware_details(updated_cluster_yaml, hardware_entries, 'rafay')
+        updated_cluster_yaml = update_tinkerbell_ip(cluster_yaml, tinkerbell_ip, 'rafay_eksabm_cluster')
+        updated_cluster_yaml = update_endpoint_ip(updated_cluster_yaml, endpoint_host_ip, 'rafay_eksabm_cluster')
+        updated_cluster_yaml = update_gateway_id(updated_cluster_yaml, gateway_id, 'rafay_eksabm_cluster')
+        updated_cluster_yaml = update_hardware_details(updated_cluster_yaml, hardware_entries, 'rafay_eksabm_cluster')
         yaml_data = yaml.safe_load_all(updated_cluster_yaml)
         json_data = json.dumps([doc for doc in yaml_data], indent=2)
         updated_spec_data = json.loads(json_data)[0]
@@ -787,12 +787,12 @@ def update_tinkerbell_ip(yaml_file_content, tinkerbell_ip, provisioner):
 
     updated_yaml_documents = []
 
-    if provisioner == "native":
+    if provisioner == "eksabm_cluster":
         for doc in yaml_data:
             if doc is not None and "kind" in doc and doc["kind"] == "TinkerbellDatacenterConfig":
                 doc["spec"]["tinkerbellIP"] = tinkerbell_ip
             updated_yaml_documents.append(doc)
-    elif provisioner == "rafay":
+    elif provisioner == "rafay_eksabm_cluster":
         for doc in yaml_data:
             if doc is not None and "kind" in doc and doc["kind"] == "Cluster":
                 doc["spec"]["config"]["tinkerbellDatacenterConfig"]["spec"]["tinkerbellIP"] = tinkerbell_ip
@@ -807,12 +807,12 @@ def update_endpoint_ip(yaml_file_content, endpoint_ip, provisioner):
 
     updated_yaml_documents = []
 
-    if provisioner == "native":
+    if provisioner == "eksabm_cluster":
         for doc in yaml_data:
             if doc is not None and "kind" in doc and doc["kind"] == "Cluster":
                 doc["spec"]["controlPlaneConfiguration"]["endpoint"]["host"] = endpoint_ip
             updated_yaml_documents.append(doc)
-    elif provisioner == "rafay":
+    elif provisioner == "rafay_eksabm_cluster":
         for doc in yaml_data:
             if doc is not None and "kind" in doc and doc["kind"] == "Cluster":
                 doc["spec"]["config"]["eksaClusterConfig"]["spec"]["controlPlaneConfiguration"]["endpoint"]["host"] = endpoint_ip
@@ -827,7 +827,7 @@ def update_gateway_id(yaml_file_content, gateway_id, provisioner):
 
     updated_yaml_documents = []
 
-    if provisioner == "rafay":
+    if provisioner == "rafay_eksabm_cluster":
         for doc in yaml_data:
             if doc is not None and "kind" in doc and doc["kind"] == "Cluster":
                 doc["spec"]["gatewayID"] = gateway_id
@@ -1727,7 +1727,7 @@ def eksabm_native_provisioner(input_data):
     with open("/home/ubuntu/.ssh/config", "a") as ssh_config_file:
         ssh_config_file.write(ssh_config_entry)
 
-    print(f"\n[+] Provisioning cluster_name: {cluster_name} using provisioner native ")
+    print(f"\n[+] Provisioning cluster_name: {cluster_name} using provisioner eksabm_cluster ")
 
     # Step 1. ensure existence of cluster directory
     create_dir_command=f"mkdir -p {cluster_dir}"
@@ -1752,8 +1752,8 @@ def eksabm_native_provisioner(input_data):
     
     # Step 3. create cluster config file
     if cluster_yaml is not None:
-        updated_cluster_yaml = update_tinkerbell_ip(cluster_yaml, tinkerbell_ip, 'native')
-        updated_cluster_yaml = update_endpoint_ip(updated_cluster_yaml, endpoint_host_ip, 'native')
+        updated_cluster_yaml = update_tinkerbell_ip(cluster_yaml, tinkerbell_ip, 'eksabm_cluster')
+        updated_cluster_yaml = update_endpoint_ip(updated_cluster_yaml, endpoint_host_ip, 'eksabm_cluster')
         echo_cluster_config_content_command=f'echo "{updated_cluster_yaml}" > {remote_cluster_yaml_location}'
     else:
         cluster_yaml=build_native_eksabm_cluster_spec(cluster_name,k8s_version,cp_count,endpoint_host_ip,dp_count,tinkerbell_ip,ssh_public_key)

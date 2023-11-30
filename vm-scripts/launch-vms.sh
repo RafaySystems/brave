@@ -156,6 +156,9 @@ launch-ubuntu-vm() {
     echo -e "\t[+] Setting up ${VM_NAME} vm's netplan to switch to NAT network 'vm-net'"
     vagrant ssh -c "sudo cp -p /vagrant/01-netcfg.yaml /etc/netplan/01-netcfg.yaml; cat /etc/netplan/01-netcfg.yaml"
 
+    echo -e "\t[+] Growing root partition\n"
+    vagrant ssh -c 'sudo growpart /dev/sda 3 && sudo pvresize /dev/sda3 && sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv && sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv'
+
     echo -e "\t[+] Setting up ${VM_NAME} vm's ssh key based auth "
     sleep 40
     vagrant ssh -c "cat /vagrant/vm-sshkey.pub | sudo tee -a /root/.ssh/authorized_keys; cat /vagrant/vm-sshkey.pub >> /home/vagrant/.ssh/authorized_keys"

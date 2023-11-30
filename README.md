@@ -4,6 +4,7 @@
 ---
 
 - [Overview](#overview)
+- [Applications](#applications)
 - [Installation](#installation)
     - [Clone Repo locally](#clone-repo-locally)
     - [Install Terraform](#install-terraform)
@@ -53,6 +54,28 @@ Cost and complexity of bare metal deployments can be prohibitive for a number of
 **BRAVE** is written to be extensible and its functionality can be extended for new bare metal use cases by adding new provisioners. Each provisioner implements tailored workflow specifically designed for utilizing bare metal infrastructure in a particular use case.
 
 **BRAVE** is a [Rafay Systems Inc.](https://rafay.co/) project. For a comprehensive list of all open-source projects by Rafay, please refer to this [link](https://docs.rafay.co/oss/overview/).
+
+---
+
+## Applications 
+
+- **Development and Testing Environments**: Developers can use the tool to create virtualized instances of bare metal servers for testing applications, new software configurations, or updates without affecting production environments.
+
+- **Automated Testing Pipelines**: Integration into automated testing pipelines allows for the creation of disposable VM instances on bare metal servers, facilitating continuous integration and deployment (CI/CD) workflows.
+
+- **Security Testing and Vulnerability Assessment**: Security professionals can use the tool to  simulate different attack scenarios, test security measures, and perform vulnerability assessments in a controlled environment without risking actual production systems.
+
+- **DevOps Testing Environment Creation**: Developers and operations teams often require testing environments that mimic production setups. This tool can create VMs on bare metal to replicate various configurations, allowing for robust testing of software deployments, updates, and configurations.
+
+- **Disaster Recovery Testing**: Simulate disaster recovery scenarios by virtualizing bare metal servers and testing backup and recovery processes.Ensure the resilience and reliability of applications in case of hardware failures or other catastrophic events.
+
+- **Scaling Infrastructure Testing**: Organizations planning to scale their infrastructure can use the tool to simulate the impact of increased loads, ensuring that their systems can handle the growth effectively before implementing changes in the actual environment.
+
+- **Research and Development**: Researchers or innovators can leverage the virtualized bare metal servers to experiment with new technologies, run simulations, or conduct performance evaluations without the need for dedicated physical hardware.
+
+- **Education and Training**: It can serve as an educational tool for students or professionals learning about server infrastructure. They can practice setting up, configuring, and managing servers in a safe and controlled virtual environment.
+
+- **Cost Reduction**: Creating virtual environments for all above use cases at fraction of cost of physical hardware.  Elimination of the need for dedicated physical hardware, also reduces associated costs like procurement, maintenance, and space.
 
 ---
 

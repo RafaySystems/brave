@@ -1641,7 +1641,7 @@ def eksabm_rafay_provisioner(input_data):
 
 
 def eksctl_create_cluster(cluster_dir, cluster_name, eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, seq):
-    eksctl_cluster_create_cmd=f"pushd {cluster_dir}; eksctl anywhere create cluster --no-timeouts --force-cleanup --hardware-csv hardware.csv -f {cluster_name}.yaml 2>&1 | tee -a {cluster_dir}/eksa-create-cluster.log; popd"
+    eksctl_cluster_create_cmd=f"pushd {cluster_dir}; eksctl anywhere create cluster --no-timeouts --hardware-csv hardware.csv -f {cluster_name}.yaml 2>&1 | tee -a {cluster_dir}/eksa-create-cluster.log; popd"
     print(f"\n[{seq}.] Creating cluster : {eksctl_cluster_create_cmd}")
     full_command = f"sudo su -c '{eksctl_cluster_create_cmd}'"
     stdout,err = execute_remote_command(eksa_admin_ip, eksa_admin_port, eksa_admin_username, eksa_admin_password, full_command)

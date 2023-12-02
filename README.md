@@ -1,6 +1,8 @@
 # BRAVE
 `Bare Metal Replication And Virtualization Environment`
 
+![Bare Metal Replication And Virtualization Environment](docs/brave.gif)
+
 ---
 
 - [Overview](#overview)

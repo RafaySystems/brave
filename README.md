@@ -10,6 +10,7 @@
     - [Install Terraform](#install-terraform)
     - [Install Python3 and dependencies](#install-python3-and-dependencies)
 - [Usage](#usage)
+    - [Usage Videos](#usage-videos)
     - [Structure of Configuration File](#structure-of-configuration-file)
     - [Multiple BRAVE Environments](#multiple-brave-environments)
 - [Supported Infrastructure Providers and Provisioners](#supported-infrastructure-providers-and-provisioners)
@@ -145,6 +146,24 @@ source venv/bin/activate
 ```sh
 ./delete.py
 ```
+
+---
+
+### Usage Videos 
+
+- Using BRAVE to create VMs simulating Bare Metal servers using an OCI cloud instance
+
+[<img src="http://img.youtube.com/vi/BK-KHmxRZB0/0.jpg" width="30%">](http://www.youtube.com/watch?v=BK-KHmxRZB0 "Using BRAVE to create VMs simulating Bare Metal servers using an OCI cloud instance")
+
+- Using BRAVE to create an EKSA Bare Metal cluster using an OCI cloud instance
+
+[<img src="http://img.youtube.com/vi/hbYLJfoaC4Y/0.jpg" width="30%">](http://www.youtube.com/watch?v=hbYLJfoaC4Y "Using BRAVE to create an EKSA Bare Metal cluster using an OCI cloud instance")
+
+- Using BRAVE to create an RAFAY EKSA Bare Metal cluster using an OCI cloud instance
+
+[<img src="http://img.youtube.com/vi/GCAL9J7bRzA/0.jpg" width="30%">](http://www.youtube.com/watch?v=GCAL9J7bRzA "Using BRAVE to create an RAFAY EKSA Bare Metal cluster using an OCI cloud instance")
+
+---
 
 ### Structure of Configuration File 
 

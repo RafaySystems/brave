@@ -116,6 +116,8 @@ pip3 install -r requirements.txt
 
 1. A file named `input.yaml` is expected to provide configuration input for **BRAVE**. This file describes the desired deployment to create. Populate this `input.yaml` file using the provided [sample configuration file](sample-input.yaml) and then edit it to customize it. 
 
+A number of ready to use examples are also provided in [discussion on the structure](docs/input-yaml.md) of BRAVE's configuration file.
+
 ```sh
 cp -p sample-input.yaml input.yaml
 ```
